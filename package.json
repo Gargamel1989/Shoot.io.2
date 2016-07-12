@@ -1,0 +1,17 @@
+{
+  "name": "Shoot.io",
+  "author" : "Joep Driesen",
+  "description": "Real time multiplayer shooter based on the old GTA.",
+  "repository": "https://github.com/Gargamel1989/Shoot.io.git",
+  "license": "MIT",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "3.3.x",
+    "socket.io": "1.4.x",
+    "node-uuid": "1.3.3",
+    "mainloop": "git://github.com/IceCreamYou/MainLoop.js.git#1.0.3"
+  },
+  "engine": {
+    "node": "0.10.x"
+  }
+}
