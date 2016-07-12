@@ -101,6 +101,29 @@
 
     };
 
+    e.game_core.prototype.update_world_from_snapshot = function( world_snapshot ) {
+        
+        for ( player_id in world_snapshot ) {
+
+            var player_snapshot = world_snapshot[player_id];
+
+            if ( !this.avatars[player_id] )
+                this.add_avatar( player_id );
+
+            this.avatars[player_id].set_position( player_snapshot.ps.x, player_snapshot.ps.y );
+            this.avatars[player_id].direction = player_snapshot.d;
+
+        }
+
+        for ( player_id in this.avatars ) {
+
+            if ( !world_snapshot[player_id] )
+                delete this.avatars[player_id];
+
+        }
+
+    };
+
     e.game_core.prototype.update = function( dt ) {
 
         for ( player_id in this.avatars )
@@ -109,8 +132,19 @@
     };
 
     e.game_core.prototype.world_snapshot = function() {
+       
+        var snapshot = {};
 
-        return {};
+        for ( player_id in this.avatars ) {
+            
+            snapshot[player_id] = {
+                ps: this.avatars[player_id].position,
+                d: this.avatars[player_id].direction,
+            };
+
+        }
+
+        return snapshot;
 
     };
 

@@ -75,10 +75,9 @@ game_client.prototype.on_connected = function( player ) {
 	
 	// Start listening to mouse events
     this.camera.stage.on( 'stagemousemove', ( function( event ) {
-        var world_mouse = this.camera.camera_to_world_coordinates( event.stageX, event.stageY );
 
-        this.mouse.x = world_mouse.x
-		this.mouse.y = world_mouse.y;
+        this.mouse.x = event.stageX;
+		this.mouse.y = event.stageY;
 
     } ).bind( this ) );
 
@@ -118,8 +117,8 @@ game_client.prototype.on_message = function( data ) {
 };
 
 game_client.prototype.on_server_update = function( data ) {
-
-    //console.log( 'Server Update: ' + data );
+    
+    this.core.update_world_from_snapshot( data );
 
 };
 
@@ -144,7 +143,8 @@ game_client.prototype.begin = function( timestamp, delta ) {
     // TODO: in the future check if the mouse position has changed since
     // last frame, if not, don't push it and if inputs is empty, don't send
     // a server message    
-	this.inputs.push( 'm|' + this.mouse.x + '|' + this.mouse.y );
+    var world_mouse = this.camera.camera_to_world_coordinates( this.mouse.x, this.mouse.y );
+	this.inputs.push( 'm|' + world_mouse.x + '|' + world_mouse.y );
 
 	// Send the input vector to the server
 	var server_packet = 'i#';

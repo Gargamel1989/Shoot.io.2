@@ -1,3 +1,4 @@
+g           = require( __base + 'js/common/game.globals.js' ),
 f           = require( __base + 'js/common/game.functions.js' ),
 game_core   = require( __base + 'js/common/game.core.js' ),
 game_avatar = require( __base + 'js/common/game.avatar.js' );
@@ -52,7 +53,7 @@ game_server.begin = function( timestamp, delta ) {
 game_server.update = function( delta ) {
 
     // Update the world
-    game_server.core.update( delta )
+    game_server.core.update( delta );
 
 };
 

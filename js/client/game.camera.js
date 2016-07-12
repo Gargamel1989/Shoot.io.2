@@ -2,22 +2,43 @@ var game_camera = function( game_core ) {
 
     this.core = game_core;
 
+    var body = document.getElementsByTagName( 'body' )[0];
+    
+
+    this.viewport = document.getElementById( 'viewport' );
+    
     // Viewport size
     this.viewport_size = {
-        width: 1024,
-        height: 786,
+        width: 1280,
+        height: 960,
     };
-    this.viewport = document.getElementById( 'viewport' );
     //this.viewport.style.width = this.viewport_size.width + 'px';
     //this.viewport.style.height = this.viewport_size.height + 'px';
     
     this.stage = new createjs.Stage( this.viewport );
+
+    this.setup_viewport();
 
     this.world_position = { x: 0, y: 0 };
 
     this.object_to_follow = null;
 
     this.sprites = {};
+
+    this.map = new createjs.Bitmap( 'img/maps/debug.png' );
+    this.stage.addChild( this.map );
+
+};
+
+game_camera.prototype.setup_viewport = function() {
+    
+    var window_w = window.innerWidth;
+    var window_h = window.innerHeight;
+
+    this.viewport.width = window_w;
+    this.viewport.height = window_h;
+
+    console.log(window_w, window_h);
 
 };
 
@@ -54,6 +75,11 @@ game_camera.prototype.update = function( dt ) {
 
     }
 
+    // Map is always at world coordinates 0, 0
+    var map_camera_pos = this.world_to_camera_coordinates( 0, 0 );
+    this.map.x = map_camera_pos.x;
+    this.map.y = map_camera_pos.y;
+
     for ( player_id in this.core.avatars ) {
         
         if ( !this.sprites[player_id] ) {
@@ -81,11 +107,10 @@ game_camera.prototype.update = function( dt ) {
         var camera_position = this.world_to_camera_coordinates( avatar.position.x, avatar.position.y );
         
         
-//        sprite.x = camera_position.x;
-  //      sprite.y = camera_position.y;
-  sprite.y = 100;
+        sprite.x = camera_position.x;
+        sprite.y = camera_position.y;
         sprite.angle = 360 * avatar.direction / ( 2 * Math.PI );
-        console.log(sprite.x, sprite.y);
+        
     };
 
 };

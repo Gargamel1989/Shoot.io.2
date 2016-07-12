@@ -49,12 +49,15 @@ global.__base = __dirname + '/';
         res.header( 'Cache-Control', 'private, no-cache, no-store, must-revalidate' );
         res.header( 'Expires', -1 );
         res.header( 'Pragme', 'no-cache' );
-       
+
         if ( req.params[0] === 'mainloop.min.js' )
             res.sendfile( __dirname + '/node_modules/mainloop.js/build/mainloop.min.js' );
-        if ( req.params[0] === 'mainloop.min.js.map' )
+        else if ( req.params[0] === 'mainloop.min.js.map' )
             res.sendfile( __dirname + '/node_modules/mainloop.js/build/mainloop.min.js.map' );
-
+        else
+            res.sendfile( __dirname + '/js/lib/' + req.params[0] );
+ 
+/**
         if ( req.params[0] === 'socket.io/socket.io.js' ) {
         
             res.writeHead(302, {
@@ -104,7 +107,7 @@ global.__base = __dirname + '/';
             res.end();
 
         }
-
+**/
     } );
 
 

@@ -1,25 +1,24 @@
+// Utility functions
 ( function( e ) {
 
+    e.v_add = function( v1, v2 ) {
+        return { x: v1.x + v2.x, y: v1.y + v2.y };
+    };
+
+    e.v_angle = function( v ) {
+        return Math.atan2( v.y, v.x );
+    };
+
     e.v_mag = function( v ) {
-        
-        var sum = 0;
+        return Math.sqrt( v.x * v.x + v.y * v.y );
+    };
 
-        for ( attr in v )
-            sum += v[attr] * v[attr];
-
-        return Math.sqrt( sum );
-
+    e.v_mul_scalar = function( v, scalar ) {
+        return { x: v.x * scalar, y: v.y * scalar };
     };
 
     e.v_sub = function( v1, v2 ) {
-
-        v_res = {};
-
-        for ( attr in v1 )
-            v_res[attr] = v1[attr] - v2[attr];
-
-        return v_res;
-    
+        return { x: v1.x - v2.x, y: v1.y - v2.y };
     };
 
 }( typeof exports === 'undefined' ? this.f = {} : exports ) );
