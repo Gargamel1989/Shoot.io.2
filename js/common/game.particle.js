@@ -1,7 +1,8 @@
 ( function( e ) {
 
-    e.bullet = function( creation_time, origin, direction, radius, speed, distance_to_live, damage ) {
-       
+    e.bullet = function( id, creation_time, origin, direction, radius, speed, distance_to_live, damage ) {
+        
+        this.id = id || UUID();
         this.creation_time = creation_time; 
         this.origin = origin;
         this.direction = direction;
@@ -31,6 +32,15 @@
 
         this.position = f.v_add( this.position, this.movement_vector );
         console.log('Bullet at ' + this.position.x + ', ' + this.position.y );
+    };
+
+    e.bullet.prototype.snapshot = function() {
+
+        return {
+            id: this.id,
+            p: this.position,
+        };
+
     };
 
 }( typeof exports === 'undefined' ? this.game_particle = {} : exports ) );

@@ -5,8 +5,9 @@ game_avatar     = require( __base + 'js/common/game.avatar.js' );
 game_weapon     = require( __base + 'js/common/game.weapon.js' );
 game_particle   = require( __base + 'js/common/game.particle.js' );
 
-var UUID        = require( 'node-uuid' ),
-    MainLoop    = require( 'mainloop.js' ),
+UUID            = require( 'node-uuid' );
+
+var MainLoop    = require( 'mainloop.js' ),
 
     verbose     = true;
 
