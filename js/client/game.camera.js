@@ -89,18 +89,18 @@ game_camera.prototype.update = function( dt ) {
             if ( this.show_debug_shapes ) {
 
                 var debug_position = new createjs.Shape();
-                debug_position.graphics.f( 'red' ).dc( 0, 0, 20 );
 
                 this.stage.addChild( debug_position );
 
                 if ( !this.debug_shapes[player_id] )
-                    this.debug_shapes[player_id] = [];
+                    this.debug_shapes[player_id] = {}
 
-                this.debug_shapes[player_id].push( debug_position );
-
-                if ( avatar.equiped_weapon !== null && avatar.equiped_weapon.state != avatar.equiped_weapon.STATES.idle )
-                    this.debug_shapes[player_id][0].color = 'green';
-
+                this.debug_shapes[player_id]['position'] = {
+                    shape: debug_position,
+                    anchor: { x: 0, y: 0 },
+                    state: null,
+                };
+                
             }
 
             var sprite = new createjs.Sprite( assets.getResult( 'feet' ), 'idle' );
@@ -132,12 +132,24 @@ game_camera.prototype.update = function( dt ) {
         
         if ( this.show_debug_shapes && this.debug_shapes[player_id] ) {
 
-            for ( var i = 0; i < this.debug_shapes[player_id].length; i++ ) {
+            for ( debug_type in this.debug_shapes[player_id] ) {
 
-                this.debug_shapes[player_id][i].x = sprite.x;
-                this.debug_shapes[player_id][i].y = sprite.y;
+                this.debug_shapes[player_id][debug_type].shape.x = sprite.x;
+                this.debug_shapes[player_id][debug_type].shape.y = sprite.y;
 
             }
+                
+            if ( avatar.equiped_weapon !== null && this.debug_shapes[player_id]['position'].state != avatar.equiped_weapon.state ) {
+
+                if ( avatar.equiped_weapon.state != avatar.equiped_weapon.STATES.idle )
+                    this.debug_shapes[player_id]['position'].shape.graphics.clear().f( 'green' ).dc( 0, 0, 20 );
+                else
+                    this.debug_shapes[player_id]['position'].shape.graphics.clear().f( 'red' ).dc( 0, 0, 20 );
+                
+                this.debug_shapes[player_id]['position'].state = avatar.equiped_weapon.state;
+                
+            }
+
 
         }
     };

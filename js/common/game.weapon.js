@@ -20,7 +20,7 @@
 
     e.knife = function() {
 
-        this.weapon_name = 'Knife';
+        this.name = 'Knife';
 
         this.STATES = {
             idle: 'idle',
@@ -57,7 +57,7 @@
     e.knife.prototype.snapshot = function() {
      
         return { 
-            name: this.weapon_name,
+            name: this.name,
             s: this.state,
             t: this.time_since_attack_start,
         };
@@ -78,9 +78,10 @@
             this.time_since_attack_start += dt;
 
             if ( this.time_since_attack_start >= this.attack_duration )
-                this.state == this.STATES.idle;
+                this.state = this.STATES.idle;
 
         }
+        
     }
 
 }( typeof exports === 'undefined' ? this.game_weapon = {} : exports ) );

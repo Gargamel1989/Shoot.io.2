@@ -176,7 +176,10 @@ game_client.prototype.begin = function( timestamp, delta ) {
 game_client.prototype.update = function( dt ) {
     
     this.camera.update();
-
+for (i in this.core.avatars) {
+    var a = this.core.avatars[i];
+    console.log(a.equiped_weapon.state);
+}
 };
 
 game_client.prototype.draw = function() {
