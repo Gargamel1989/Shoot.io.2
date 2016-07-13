@@ -14,8 +14,8 @@
         this.max_health = 100;
         this.health = this.max_health;
 
-        this.inventory = [];
-        this.equiped_weapon = null;
+        this.inventory = [ new game_weapon.knife() ];
+        this.equiped_weapon = this.inventory[0];
 
         // Input variables
         this.input_vector = null;
@@ -54,6 +54,21 @@
 
         }
 
+        // Handle input for equiped weapon
+        if ( this.equiped_weapon !== null ) {
+
+            if ( this.input_vector.lmb == 'down' )
+                this.equiped_weapon.start_primary_action();
+            else if ( this.input_vector.lmb == 'up' )
+                this.equiped_weapon.end_primary_action();
+
+            if ( this.input_vector.rmb == 'down' )
+                this.equiped_weapon.start_secondary_action();
+            else if ( this.input_vector.rmb == 'up' )
+                this.equiped_weapon.end_secondary_action();
+
+        }
+    
     };
 
     e.game_avatar.prototype.set_position = function( x, y ) {
@@ -84,7 +99,8 @@
                 this.direction = 2 * Math.PI - this.direction;
         
         }
-
+        
+        // Update position of the avatar
         var movement_vector = f.v_mul_scalar( this.movement_speed_vector, g.pixels_per_m * dt / 1000.0 );
         var movement_mag = f.v_mag( movement_vector );
         var movement_angle = f.v_angle( movement_vector );
@@ -97,6 +113,11 @@
         var new_position = f.v_add( this.position, absolute_movement );
         
         this.set_position( new_position.x, new_position.y );
+
+        // Update equipment of the avatar
+        if ( this.equiped_weapon !== null )
+            this.equiped_weapon.update( dt );
+
     };
 
 }( typeof exports === 'undefined' ? this.game_avatar = {} : exports ) );

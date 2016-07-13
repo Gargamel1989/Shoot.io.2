@@ -1,8 +1,23 @@
+var assets,
+	assets_manifest = [
+    { id: 'feet', src: 'img/sprites/test', type: 'spritesheet' },
+
+    { id: 'map_debug', src: 'img/maps/debug.png', type: 'image' },
+];
+
 window.onload = function() {
+	
+    assets = new createjs.LoadQueue( true, '/' );
 
-	var c = new game_client();
+    assets.addEventListener( 'complete', function() {    
 
-	c.connect();
+	    var c = new game_client();
+   
+	    c.connect();
+
+    } );
+
+    assets.loadManifest( assets_manifest );
 
 };
 

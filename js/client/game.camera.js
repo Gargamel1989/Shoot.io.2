@@ -1,6 +1,7 @@
-var game_camera = function( game_core ) {
+var game_camera = function( game_core, show_debug_shapes ) {
 
     this.core = game_core;
+    this.show_debug_shapes = show_debug_shapes || true;
 
     var body = document.getElementsByTagName( 'body' )[0];
     
@@ -24,8 +25,9 @@ var game_camera = function( game_core ) {
     this.object_to_follow = null;
 
     this.sprites = {};
+    this.debug_shapes = {};
 
-    this.map = new createjs.Bitmap( 'img/maps/debug.png' );
+    this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
     this.stage.addChild( this.map );
 
 };
@@ -37,8 +39,6 @@ game_camera.prototype.setup_viewport = function() {
 
     this.viewport.width = window_w;
     this.viewport.height = window_h;
-
-    console.log(window_w, window_h);
 
 };
 
@@ -84,13 +84,32 @@ game_camera.prototype.update = function( dt ) {
         
         if ( !this.sprites[player_id] ) {
 
-            var a = this.core.avatars[player_id];
-            var a_p = this.world_to_camera_coordinates( a.position.x, a.position.y );
-            var c = new createjs.Shape();
-            c.graphics.beginFill('red').drawCircle(0, 0, 10);
-            this.stage.addChild(c);
+            var avatar = this.core.avatars[player_id];
 
-            this.sprites[player_id] = c;
+            if ( this.show_debug_shapes ) {
+
+                var debug_position = new createjs.Shape();
+                debug_position.graphics.f( 'red' ).dc( 0, 0, 20 );
+
+                this.stage.addChild( debug_position );
+
+                if ( !this.debug_shapes[player_id] )
+                    this.debug_shapes[player_id] = [];
+
+                this.debug_shapes[player_id].push( debug_position );
+
+                if ( avatar.equiped_weapon !== null && avatar.equiped_weapon.state != avatar.equiped_weapon.STATES.idle )
+                    this.debug_shapes[player_id][0].color = 'green';
+
+            }
+
+            var sprite = new createjs.Sprite( assets.getResult( 'feet' ), 'idle' );
+            sprite.scaleX = 0.3;
+            sprite.scaleY = 0.3;
+
+            this.stage.addChild( sprite );
+
+            this.sprites[player_id] = sprite;
 
         }
 
@@ -109,8 +128,18 @@ game_camera.prototype.update = function( dt ) {
         
         sprite.x = camera_position.x;
         sprite.y = camera_position.y;
-        sprite.angle = 360 * avatar.direction / ( 2 * Math.PI );
+        sprite.rotation = 360 * avatar.direction / ( 2 * Math.PI );
         
+        if ( this.show_debug_shapes && this.debug_shapes[player_id] ) {
+
+            for ( var i = 0; i < this.debug_shapes[player_id].length; i++ ) {
+
+                this.debug_shapes[player_id][i].x = sprite.x;
+                this.debug_shapes[player_id][i].y = sprite.y;
+
+            }
+
+        }
     };
 
 };

@@ -67,18 +67,14 @@
                 case 'm':
 
                     if ( parts[1] == 'l' ) {
-
-                        if ( parts[2] == 'down' )
-                            input_vector.lmb += 1;
-                        else
-                            input_vector.lmb -= 1;
+                        
+                        // 'up' or 'down'
+                        input_vector.lmb = parts[2];
 
                     } else if ( parts[1] == 'r' ) {
 
-                        if ( parts[2] == 'down' )
-                            input_vector.rmb += 1;
-                        else
-                            input_vector.rmb -= 1;
+                        // 'up' or 'down'
+                        input_vector.rmb = parts[2];
 
                     } else {
 
@@ -110,8 +106,16 @@
             if ( !this.avatars[player_id] )
                 this.add_avatar( player_id );
 
-            this.avatars[player_id].set_position( player_snapshot.ps.x, player_snapshot.ps.y );
-            this.avatars[player_id].direction = player_snapshot.d;
+            var avatar = this.avatars[player_id];
+            
+            avatar.set_position( player_snapshot.ps.x, player_snapshot.ps.y );
+            avatar.direction = player_snapshot.d;
+
+            if ( avatar.equiped_weapon.name == player_snapshot.w.name )
+                avatar.equiped_weapon.update_from_snapshot( player_snapshot.w );
+
+            else
+                game_weapon.weapon_from_snapshot( player_snapshot.w );
 
         }
 
@@ -136,10 +140,13 @@
         var snapshot = {};
 
         for ( player_id in this.avatars ) {
+
+            var avatar = this.avatars[player_id];
             
             snapshot[player_id] = {
-                ps: this.avatars[player_id].position,
-                d: this.avatars[player_id].direction,
+                ps: avatar.position,
+                d: avatar.direction,
+                w: avatar.equiped_weapon.snapshot(),
             };
 
         }

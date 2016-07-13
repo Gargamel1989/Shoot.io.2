@@ -2,6 +2,7 @@ g           = require( __base + 'js/common/game.globals.js' ),
 f           = require( __base + 'js/common/game.functions.js' ),
 game_core   = require( __base + 'js/common/game.core.js' ),
 game_avatar = require( __base + 'js/common/game.avatar.js' );
+game_weapon = require( __base + 'js/common/game.weapon.js' );
 
 var UUID        = require( 'node-uuid' ),
     MainLoop    = require( 'mainloop.js' ),
