@@ -19,7 +19,7 @@
      * vector and assigns it to a player avatar to determine its movement
      * during the next frame.
      */
-    e.game_core.prototype.process_inputs = function( player_id, input_list ) {
+    e.game_core.prototype.process_inputs = function( timestamp, player_id, input_list ) {
         
         var avatar = this.avatars[player_id];
 
@@ -95,7 +95,7 @@
             }
         }
 
-        avatar.set_input_vector( input_vector );
+        avatar.set_input_vector( timestamp, input_vector );
 
     };
 

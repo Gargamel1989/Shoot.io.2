@@ -1,8 +1,9 @@
-g           = require( __base + 'js/common/game.globals.js' ),
-f           = require( __base + 'js/common/game.functions.js' ),
-game_core   = require( __base + 'js/common/game.core.js' ),
-game_avatar = require( __base + 'js/common/game.avatar.js' );
-game_weapon = require( __base + 'js/common/game.weapon.js' );
+g               = require( __base + 'js/common/game.globals.js' ),
+f               = require( __base + 'js/common/game.functions.js' ),
+game_core       = require( __base + 'js/common/game.core.js' ),
+game_avatar     = require( __base + 'js/common/game.avatar.js' );
+game_weapon     = require( __base + 'js/common/game.weapon.js' );
+game_particle   = require( __base + 'js/common/game.particle.js' );
 
 var UUID        = require( 'node-uuid' ),
     MainLoop    = require( 'mainloop.js' ),
@@ -43,7 +44,7 @@ game_server.begin = function( timestamp, delta ) {
     // Handle user inputs since last frame
     for ( var player_id in game_server.inputs ) {
 
-        var input_vector = game_server.core.process_inputs( player_id, game_server.inputs[player_id] );
+        var input_vector = game_server.core.process_inputs( timestamp, player_id, game_server.inputs[player_id] );
 
         delete game_server.inputs[player_id];
 

@@ -14,7 +14,7 @@
         this.max_health = 100;
         this.health = this.max_health;
 
-        this.inventory = [ new game_weapon.knife(), new game_weapon.handgun() ];
+        this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ) ];
         this.equiped_weapon = this.inventory[0];
 
         // Input variables
@@ -32,7 +32,7 @@
 
     }; //game_avatar.constructor
 
-    e.game_avatar.prototype.set_input_vector = function( input_vector ) {
+    e.game_avatar.prototype.set_input_vector = function( timestamp, input_vector ) {
         
         this.input_vector = input_vector;
 
@@ -60,14 +60,14 @@
         if ( this.equiped_weapon !== null ) {
 
             if ( this.input_vector.lmb == 'down' )
-                this.equiped_weapon.start_primary_action();
+                this.equiped_weapon.start_primary_action( timestamp );
             else if ( this.input_vector.lmb == 'up' )
-                this.equiped_weapon.end_primary_action();
+                this.equiped_weapon.end_primary_action( timestamp );
 
             if ( this.input_vector.rmb == 'down' )
-                this.equiped_weapon.start_secondary_action();
+                this.equiped_weapon.start_secondary_action( timestamp );
             else if ( this.input_vector.rmb == 'up' )
-                this.equiped_weapon.end_secondary_action();
+                this.equiped_weapon.end_secondary_action( timestamp );
 
         }
     
@@ -76,7 +76,7 @@
     e.game_avatar.prototype.set_position = function( x, y ) {
 
         this.position.x = x;
-        this.position.y = y;
+        this.position.y = y
 
     };
 
@@ -147,7 +147,7 @@
         if ( this.equiped_weapon.name == snapshot.w.name )
             this.equiped_weapon.update_from_snapshot( snapshot.w );
         else
-            this.equiped_weapon = game_weapon.weapon_from_snapshot( snaphot.w );
+            this.equiped_weapon = game_weapon.weapon_from_snapshot( snapshot.w );
         
     };
 

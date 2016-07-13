@@ -41,7 +41,7 @@
 
     };
 
-    e.knife.prototype.start_primary_action = function() {
+    e.knife.prototype.start_primary_action = function( timestamp ) {
 
         if ( this.state != this.STATES.idle )
             return;
@@ -50,15 +50,15 @@
         this.time_since_attack_start = 0;
     }
 
-    e.knife.prototype.end_primary_action = function() {
+    e.knife.prototype.end_primary_action = function( timestamp ) {
         return;
     }
 
-    e.knife.prototype.start_secondary_action = function() {
+    e.knife.prototype.start_secondary_action = function( timestamp ) {
         return;
     }
 
-    e.knife.prototype.end_secondary_action = function() {
+    e.knife.prototype.end_secondary_action = function( timestamp ) {
         return;
     }
 
@@ -97,9 +97,11 @@
     /**
      * HANDGUN
      */
-    e.handgun = function() {
+    e.handgun = function( owner_avatar ) {
 
         this.name = 'Handgun';
+
+        this.owner = owner_avatar;
 
         this.STATES = {
             idle: 'idle',
@@ -107,22 +109,49 @@
             reloading: 'reloading',
         };
         this.state = this.STATES.idle;
+        this.action_timeout = 0;
+
+        this.shot_duration = 100; // ms
+
+        this.reload_duration = 1000; // ms
+
+        this.particles = [];
 
     };
 
-    e.handgun.prototype.start_primary_action = function() {
+    e.handgun.prototype.start_primary_action = function( timestamp ) {
+
+        if ( this.state != this.STATES.idle )
+            return;
+
+        this.state = this.STATES.shooting;
+        this.action_timeout = this.shot_duration;
+
+        this.particles.push( new game_particle.bullet(
+                    timestamp,
+                    this.owner.position,
+                    this.owner.direction,
+
+                    1, 10, 50, 10
+        ) );
+    
+    }
+
+    e.handgun.prototype.end_primary_action = function( timestamp ) {
         return;
     }
 
-    e.handgun.prototype.end_primary_action = function() {
-        return;
+    e.handgun.prototype.start_secondary_action = function( timestamp ) {
+
+        if ( this.state != this.STATES.idle )
+            return;
+
+        this.state = this.STATES.reloading;
+        this.action_timeout = this.reload_duration;
+
     }
 
-    e.handgun.prototype.start_secondary_action = function() {
-        return;
-    }
-
-    e.handgun.prototype.end_secondary_action = function() {
+    e.handgun.prototype.end_secondary_action = function( timestamp ) {
         return;
     }
 
@@ -142,6 +171,18 @@
     };
 
     e.handgun.prototype.update = function( dt ) {
+
+        if ( this.action_timeout > 0 )
+            this.action_timeout -= dt;
+
+        for ( var p_i in this.particles ) {
+
+            this.particles[p_i].update( dt );
+
+            if ( !this.particles[p_i].is_alive() )
+                delete this.particles[p_i];
+
+        }
 
     };
 

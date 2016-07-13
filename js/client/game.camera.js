@@ -63,6 +63,16 @@ game_camera.prototype.follow = function( object_to_follow ) {
 
     this.object_to_follow = object_to_follow;
 
+    if ( this.debug ) {
+
+        this.weapon_text = new createjs.Text( this.object_to_follow.equiped_weapon.name, "20px Arial", "#F00" );
+        this.weapon_text.x = 10;
+        this.weapon_text.y = 10;
+        
+        this.stage.addChild( this.weapon_text );
+
+    }
+
 };
 
 game_camera.prototype.update = function( dt ) {
@@ -99,6 +109,13 @@ game_camera.prototype.update = function( dt ) {
         animator.update();
 
     };
+
+    if ( this.debug ) {
+
+        if ( this.weapon_text.text != this.object_to_follow.equiped_weapon.name )
+            this.weapon_text.text = this.object_to_follow.equiped_weapon.name;
+
+    }
 
 };
 
