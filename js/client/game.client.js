@@ -1,9 +1,13 @@
 var assets,
 	assets_manifest = [
-    { id: 'feet', src: 'img/sprites/test', type: 'spritesheet' },
+        { id: 'feet', src: 'img/sprites/feet.json', type: 'spritesheet' },
+        { id: 'body_knife', src: 'img/sprites/body_knife.json', type: 'spritesheet' },
+        { id: 'body_handgun', src: 'img/sprites/body_handgun.json', type: 'spritesheet' },
+        { id: 'body_shotgun', src: 'img/sprites/body_shotgun.json', type: 'spritesheet' },
+        { id: 'body_rifle', src: 'img/sprites/body_rifle.json', type: 'spritesheet' },
 
-    { id: 'map_debug', src: 'img/maps/debug.png', type: 'image' },
-];
+        { id: 'map_debug', src: 'img/maps/debug.png', type: 'image' },
+    ];
 
 window.onload = function() {
 	
@@ -45,6 +49,8 @@ var game_client = function() {
 	
 	// Sequence number of the last input list sent to the server
 	this.input_seq = -1;
+
+    this.latest_server_update = null;
 
 };
 
@@ -105,6 +111,8 @@ game_client.prototype.on_connected = function( player ) {
 			this.inputs.push( 'm|r|down' );
 
     } ).bind( this ) );
+    
+    
 
     this.camera.stage.on( 'stagemouseup', ( function( event ) {
 
@@ -133,7 +141,7 @@ game_client.prototype.on_message = function( data ) {
 
 game_client.prototype.on_server_update = function( data ) {
     
-    this.core.update_world_from_snapshot( data );
+    this.latest_server_update = data;    
 
 };
 
@@ -144,16 +152,23 @@ game_client.prototype.begin = function( timestamp, delta ) {
 	this.input_seq++;
 		
 	if ( this.keyboard.pressed( 'Q' ) || this.keyboard.pressed( 'left' ) )
-        this.inputs.push('l');
+        this.inputs.push( 'l' );
 
     if ( this.keyboard.pressed( 'D' ) || this.keyboard.pressed( 'right' ) )
-        this.inputs.push('r');
+        this.inputs.push( 'r' );
 
     if ( this.keyboard.pressed( 'S' ) || this.keyboard.pressed( 'down' ) )
-        this.inputs.push('d');
+        this.inputs.push( 'd' );
 
     if ( this.keyboard.pressed( 'Z' ) || this.keyboard.pressed( 'up' ) )
-        this.inputs.push('u');
+        this.inputs.push( 'u' );
+
+    // Previous or next weapon
+    if ( this.keyboard.pressed( 'A' ) )
+        this.inputs.push( 'p' );
+
+    if ( this.keyboard.pressed( 'E' ) )
+        this.inputs.push( 'n' );
     
     // TODO: in the future check if the mouse position has changed since
     // last frame, if not, don't push it and if inputs is empty, don't send
@@ -175,11 +190,11 @@ game_client.prototype.begin = function( timestamp, delta ) {
 
 game_client.prototype.update = function( dt ) {
     
+    if ( this.latest_server_update )
+        this.core.update_world_from_snapshot( this.latest_server_update );
+
     this.camera.update();
-for (i in this.core.avatars) {
-    var a = this.core.avatars[i];
-    console.log(a.equiped_weapon.state);
-}
+
 };
 
 game_client.prototype.draw = function() {

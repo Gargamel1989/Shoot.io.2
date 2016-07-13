@@ -1,6 +1,10 @@
 // Utility functions
 ( function( e ) {
 
+    e.mod = function( n, m ) {
+        return ( ( n % m ) + m ) % m;
+    };
+
     e.v_add = function( v1, v2 ) {
         return { x: v1.x + v2.x, y: v1.y + v2.y };
     };

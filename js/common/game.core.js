@@ -64,6 +64,14 @@
                     input_vector.forward -= 1;
                     break;
 
+                case 'p':
+                    input_vector.scroll -= 1;
+                    break;
+
+                case 'n':
+                    input_vector.scroll += 1;
+                    break;
+
                 case 'm':
 
                     if ( parts[1] == 'l' ) {
@@ -99,27 +107,16 @@
 
     e.game_core.prototype.update_world_from_snapshot = function( world_snapshot ) {
         
-        for ( player_id in world_snapshot ) {
-
-            var player_snapshot = world_snapshot[player_id];
+        for ( var player_id in world_snapshot ) {
 
             if ( !this.avatars[player_id] )
                 this.add_avatar( player_id );
-
-            var avatar = this.avatars[player_id];
             
-            avatar.set_position( player_snapshot.ps.x, player_snapshot.ps.y );
-            avatar.direction = player_snapshot.d;
-
-            if ( avatar.equiped_weapon.name == player_snapshot.w.name )
-                avatar.equiped_weapon.update_from_snapshot( player_snapshot.w );
-
-            else
-                game_weapon.weapon_from_snapshot( player_snapshot.w );
-
+            this.avatars[player_id].update_from_snapshot( world_snapshot[player_id] );
+            
         }
 
-        for ( player_id in this.avatars ) {
+        for ( var player_id in this.avatars ) {
 
             if ( !world_snapshot[player_id] )
                 delete this.avatars[player_id];
@@ -130,7 +127,7 @@
 
     e.game_core.prototype.update = function( dt ) {
 
-        for ( player_id in this.avatars )
+        for ( var player_id in this.avatars )
             this.avatars[player_id].update( dt );
 
     };
@@ -139,17 +136,8 @@
        
         var snapshot = {};
 
-        for ( player_id in this.avatars ) {
-
-            var avatar = this.avatars[player_id];
-            
-            snapshot[player_id] = {
-                ps: avatar.position,
-                d: avatar.direction,
-                w: avatar.equiped_weapon.snapshot(),
-            };
-
-        }
+        for ( var player_id in this.avatars )
+            snapshot[player_id] = this.avatars[player_id].snapshot();
 
         return snapshot;
 

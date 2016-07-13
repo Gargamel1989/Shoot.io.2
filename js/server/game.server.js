@@ -41,7 +41,7 @@ game_server.begin = function( timestamp, delta ) {
     game_server.server_time = timestamp;
 
     // Handle user inputs since last frame
-    for ( player_id in game_server.inputs ) {
+    for ( var player_id in game_server.inputs ) {
 
         var input_vector = game_server.core.process_inputs( player_id, game_server.inputs[player_id] );
 
@@ -63,7 +63,7 @@ game_server.draw = function() {
     // Send world state to each connected client
     world_snapshot = game_server.core.world_snapshot();
 
-    for ( player_id in game_server.players )
+    for ( var player_id in game_server.players )
         game_server.players[player_id].emit( 'serverupdate', world_snapshot );
 
 };

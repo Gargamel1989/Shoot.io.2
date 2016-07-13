@@ -10,6 +10,10 @@
                 weapon = new e.knife();
                 break;
 
+            case 'Handgun':
+                weapon = new e.handgun();
+                break;
+
         }
 
         weapon.update_from_snapshot( weapon_snapshot );
@@ -18,6 +22,10 @@
     
     };        
 
+
+    /**
+     * KNIFE
+     */
     e.knife = function() {
 
         this.name = 'Knife';
@@ -83,5 +91,58 @@
         }
         
     }
+
+
+
+    /**
+     * HANDGUN
+     */
+    e.handgun = function() {
+
+        this.name = 'Handgun';
+
+        this.STATES = {
+            idle: 'idle',
+            shooting: 'shooting',
+            reloading: 'reloading',
+        };
+        this.state = this.STATES.idle;
+
+    };
+
+    e.handgun.prototype.start_primary_action = function() {
+        return;
+    }
+
+    e.handgun.prototype.end_primary_action = function() {
+        return;
+    }
+
+    e.handgun.prototype.start_secondary_action = function() {
+        return;
+    }
+
+    e.handgun.prototype.end_secondary_action = function() {
+        return;
+    }
+
+    e.handgun.prototype.snapshot = function() {
+     
+        return { 
+            name: this.name,
+            s: this.state,
+        };
+
+    };
+
+    e.handgun.prototype.update_from_snapshot = function( snapshot ) {
+
+        this.state = snapshot.s;
+
+    };
+
+    e.handgun.prototype.update = function( dt ) {
+
+    };
 
 }( typeof exports === 'undefined' ? this.game_weapon = {} : exports ) );

@@ -14,12 +14,14 @@
         this.max_health = 100;
         this.health = this.max_health;
 
-        this.inventory = [ new game_weapon.knife() ];
+        this.inventory = [ new game_weapon.knife(), new game_weapon.handgun() ];
         this.equiped_weapon = this.inventory[0];
 
         // Input variables
         this.input_vector = null;
         this.movement_speed_vector = null;
+        this.equipment_scroll_delay = 300; // ms
+        this.equipment_scroll_timeout = 0;
 
         // Position variables
         // Current position of the player in the world
@@ -115,8 +117,47 @@
         this.set_position( new_position.x, new_position.y );
 
         // Update equipment of the avatar
-        if ( this.equiped_weapon !== null )
+        if ( this.equiped_weapon !== null ) {
+
+            if ( this.input_vector.scroll != 0 && this.equipment_scroll_timeout <= 0 ) {
+
+                // Avatar changed equipment
+                var weapon_i = this.inventory.indexOf( this.equiped_weapon );
+                
+                if ( weapon_i >= 0 )
+                    this.equiped_weapon = this.inventory[f.mod( weapon_i + this.input_vector.scroll, this.inventory.length )];
+
+                this.equipment_scroll_timeout = this.equipment_scroll_delay;
+
+            }
+
+            if ( this.equipment_scroll_timeout > 0 )
+                this.equipment_scroll_timeout -= dt;
+
             this.equiped_weapon.update( dt );
+
+        }
+
+    };
+
+    e.game_avatar.prototype.update_from_snapshot = function( snapshot ) {
+        
+        this.position = snapshot.p;
+        this.direction = snapshot.d;
+        if ( this.equiped_weapon.name == snapshot.w.name )
+            this.equiped_weapon.update_from_snapshot( snapshot.w );
+        else
+            this.equiped_weapon = game_weapon.weapon_from_snapshot( snaphot.w );
+        
+    };
+
+    e.game_avatar.prototype.snapshot = function() {
+        
+        return {
+            p: this.position,
+            d: this.direction,
+            w: this.equiped_weapon.snapshot(),
+        };
 
     };
 
