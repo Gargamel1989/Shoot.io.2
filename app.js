@@ -15,6 +15,7 @@ global.__base = __dirname + '/';
 
         io              = require('socket.io'),
         express         = require('express'),
+        fs              = require('fs'),
         UUID            = require('node-uuid'),
 
         verbose         = false,
@@ -54,60 +55,71 @@ global.__base = __dirname + '/';
             res.sendfile( __dirname + '/node_modules/mainloop.js/build/mainloop.min.js' );
         else if ( req.params[0] === 'mainloop.min.js.map' )
             res.sendfile( __dirname + '/node_modules/mainloop.js/build/mainloop.min.js.map' );
-        else
-            res.sendfile( __dirname + '/js/lib/' + req.params[0] );
+
+        fs.stat( __dirname + '/js/lib/' + req.params[0], function( err, stat ) {
+            
+            if ( err === null )
+                res.sendfile( __dirname + '/js/lib/' + req.params[0] );
+
+            else if ( err.code == 'ENOENT' ) {
  
-/**
-        if ( req.params[0] === 'socket.io/socket.io.js' ) {
+                if ( req.params[0] === 'socket.io/socket.io.js' ) {
+                         
+                    res.writeHead(302, {
+                        'Location': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js'
+                    });
+                    
+                    res.end();
         
-            res.writeHead(302, {
-                'Location': 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.js'
-            });
-            
-            res.end();
-
-        }
-
-        if ( req.params[0] === 'dat.gui.min.js' ) {
+                }
         
-            res.writeHead(302, {
-                'Location': 'https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js'
-            });
-            
-            res.end();
-
-        }
-
-        if ( req.params[0] === 'EaselJS-0.8.2/lib/easeljs-0.8.2.min.js' ) {
+                if ( req.params[0] === 'dat.gui.min.js' ) {
+                
+                    res.writeHead(302, {
+                        'Location': 'https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.min.js'
+                    });
+                    
+                    res.end();
         
-            res.writeHead(302, {
-                'Location': 'https://cdnjs.cloudflare.com/ajax/libs/EaselJS/0.8.0/easeljs.min.js'
-            });
-            
-            res.end();
-
-        }
-
-        if ( req.params[0] === 'PreloadJS-0.6.2/lib/preloadjs-0.6.2.min.js' ) {
+                }
         
-            res.writeHead(302, {
-                'Location': 'https://cdnjs.cloudflare.com/ajax/libs/PreloadJS/0.6.0/preloadjs.min.js'
-            });
-            
-            res.end();
-
-        }
-
-        if ( req.params[0] === 'keyboard.js' ) {
+                if ( req.params[0] === 'EaselJS-0.8.2/lib/easeljs-0.8.2.min.js' ) {
+                
+                    res.writeHead(302, {
+                        'Location': 'https://cdnjs.cloudflare.com/ajax/libs/EaselJS/0.8.0/easeljs.min.js'
+                    });
+                    
+                    res.end();
         
-            res.writeHead(302, {
-                'Location': 'https://raw.githubusercontent.com/jeromeetienne/threex.keyboardstate/master/threex.keyboardstate.js'
-            });
+                }
+        
+                if ( req.params[0] === 'PreloadJS-0.6.2/lib/preloadjs-0.6.2.min.js' ) {
+                
+                    res.writeHead(302, {
+                        'Location': 'https://cdnjs.cloudflare.com/ajax/libs/PreloadJS/0.6.0/preloadjs.min.js'
+                    });
+                    
+                    res.end();
+        
+                }
+        
+                if ( req.params[0] === 'keyboard.js' ) {
+                
+                    res.writeHead(302, {
+                        'Location': 'https://raw.githubusercontent.com/jeromeetienne/threex.keyboardstate/master/threex.keyboardstate.js'
+                    });
+                    
+                    res.end();
+        
+                }
             
-            res.end();
+            }            
+            
+            else
+                console.log( 'ERROR: Error file stat "' + __dirname + '/js/lib/' + req.params[0] + '".' );
 
-        }
-**/
+        } );
+
     } );
 
 
