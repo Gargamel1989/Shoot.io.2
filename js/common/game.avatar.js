@@ -18,7 +18,7 @@
         this.max_health = 100;
         this.health = this.max_health;
 
-        this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ) ];
+        this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ), new game_weapon.shotgun( this ) ];
         this.equiped_weapon = this.inventory[0];
 
         // Input variables
@@ -40,7 +40,7 @@
     }; //game_avatar.constructor
 
     e.game_avatar.prototype.damage = function( amount ) {
-        
+       
         this.health = Math.max( 0, this.health - amount );
 
     };

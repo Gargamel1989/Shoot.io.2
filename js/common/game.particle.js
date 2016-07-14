@@ -8,8 +8,92 @@
 
     };
 
+    
+
+    /**
+     * KNIFE PARTICLE: SLASH
+     */
+    e.slash = function( id, creation_time, slicer, offset, hitbox_radius, duration, damage ) {
+
+        this.id = id || UUID();
+        this.creation_time = creation_time;
+        this.slicer = slicer;
+
+        this.offset = offset;
+        this.hitbox_radius = hitbox_radius;
+        this.duration = duration;
+        this.damage = damage;
+
+        this.position = { x: this.slicer.position.x, y: this.slicer.position.y };
+        this.hitbox = { x: this.position.x, y: this.position.y, r: this.hitbox_radius };
+        this.offset_mag = f.v_mag( this.offset );
+        this.offset_angle = f.v_angle( this.offset );
+
+        this.has_hit = [];
+        this.has_faded = false;
+
+        this.age = 0;
+    };
+
+    e.slash.prototype.hit = function( target ) {
+    
+        // Only do damage on the first hit of a target    
+        if ( this.has_hit.indexOf( target ) < 0 )
+            target.damage( this.damage );
+
+    };
+
+    e.slash.prototype.is_alive = function() {
+
+        return ( !this.has_faded );
+
+    };
+
+    e.slash.prototype.update = function( dt ) {
+
+        this.age += dt;
+        
+        this.set_position( {
+            x: this.slicer.position.x + ( this.offset_mag * Math.cos( this.offset_angle + this.slicer.direction ) ),
+            y: this.slicer.position.y + ( this.offset_mag * Math.sin( this.offset_angle + this.slicer.direction ) ),
+        } );
+
+        if ( this.age > this.duration )
+            this.faded = true;
+        
+    };
+
+    e.slash.prototype.set_position = function( x, y ) {
+
+        this.position.x = x;
+        this.position.y = y;
+
+        this.hitbox.x = x;
+        this.hitbox.y = y;
+
+    };
+
+    e.slash.prototype.snapshot = function() {
+
+        return {
+            id: this.id,
+            p: this.position,
+            r: this.hitbox_radius,
+        };
+
+    };
+
+    e.slash.prototype.update_from_snapshot = function( snapshot ) {
+
+        this.position = snapshot.p;
+
+    };
 
 
+
+    /**
+     * HANDGUN, RIFLE PARTICLE: BULLET
+     */
     e.bullet = function( id, creation_time, shot_by, origin, direction, hitbox_radius, speed, distance_to_live, damage ) {
         
         this.id = id || UUID();
