@@ -29,6 +29,8 @@ var game_camera = function( game_core, debug ) {
     this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
     this.stage.addChild( this.map );
 
+	this.particle_sprites = {};
+
 };
 
 game_camera.prototype.setup_viewport = function() {
@@ -100,15 +102,47 @@ game_camera.prototype.update = function( dt ) {
 
         var animator = this.animators[player_id];
 
-        if ( !this.core.avatars[player_id] )
-            animator.hide();
+        if ( !this.core.avatars[player_id] ) {
 
-        else
-            animator.show();
+            this.animators[player_id].destroy();
+            delete this.animators[player_id];
+
+        }
 
         animator.update();
 
     };
+
+	for ( var particle_id in game_particle.world_particles ) {
+
+        var particle = game_particle.world_particles[particle_id];
+
+        if ( !this.particle_sprites[particle_id] ) {
+
+            this.particle_sprites[particle_id] = new createjs.Shape();
+            this.particle_sprites[particle_id].graphics.clear().f( 'white' ).dc( 0, 0, particle.hitbox_radius );
+
+            this.stage.addChild( this.particle_sprites[particle_id] );
+
+        }
+
+        var cam_pos = this.world_to_camera_coordinates( particle.position.x, particle.position.y );
+
+        this.particle_sprites[particle_id].x = cam_pos.x;
+        this.particle_sprites[particle_id].y = cam_pos.y;
+
+    }
+
+    for ( var particle_id in this.particle_sprites ) {
+
+        if ( !game_particle.world_particles[particle_id] ) {
+
+            this.stage.removeChild( this.particle_sprites[particle_id] );
+            delete this.particle_sprites[particle_id];
+
+        }
+
+    }
 
     if ( this.debug ) {
 

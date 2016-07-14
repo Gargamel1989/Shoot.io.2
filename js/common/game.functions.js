@@ -5,6 +5,8 @@
         return ( ( n % m ) + m ) % m;
     };
 
+
+
     e.v_add = function( v1, v2 ) {
         return { x: v1.x + v2.x, y: v1.y + v2.y };
     };
@@ -24,5 +26,12 @@
     e.v_sub = function( v1, v2 ) {
         return { x: v1.x - v2.x, y: v1.y - v2.y };
     };
+
+
+
+    e.are_colliding_circles = function( circle1, circle2 ) {
+        return e.v_mag( e.v_sub( circle2, circle1 ) ) <= ( circle1.radius + circle2.radius );
+    };
+
 
 }( typeof exports === 'undefined' ? this.f = {} : exports ) );

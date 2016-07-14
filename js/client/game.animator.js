@@ -15,36 +15,45 @@ var game_animator = function( camera, avatar, debug ) {
     this.body_sprite.scaleX = 0.3;
     this.body_sprite.scaleY = 0.3;
 
+    this.health_bar_width = 50;
+    this.health_bar_height = 5;
+    this.health_bar_margin = 2;
+    this.health_bar_offset = -40;
+
+    this.health_bar_wrapper = new createjs.Shape();
+    this.health_bar_wrapper.graphics.clear().f( 'black' ).dr( 0, 0, this.health_bar_width + ( 2 * this.health_bar_margin ), this.health_bar_height + ( 2 * this.health_bar_margin ) );
+
+    this.health_bar = new createjs.Shape();
+    this.health_bar.graphics.clear().f( 'red' ).dr( 0, 0, this.health_bar_width, this.health_bar_height );
+
     if ( this.debug ) {
 
         this.debug_position = new createjs.Shape();
         this.debug_position.graphics.clear().f( 'red' ).dc( 0, 0, 20 );
         
-    };
-
-};
-
-game_animator.prototype.hide = function() {
-
-	this.visible = false;
-    this.stage.removeChild( this.feet_sprite );
-    this.stage.removeChild( this.body_sprite );
-
-	if ( this.debug ) {
-	    this.stage.removeChild( this.debug_position );
-	}
-
-};
-
-game_animator.prototype.show = function() {
-
-    if ( this.debug ) {
         this.stage.addChild( this.debug_position );
     }
 
 	this.visible = true;
     this.stage.addChild( this.feet_sprite );
     this.stage.addChild( this.body_sprite );
+    this.stage.addChild( this.health_bar_wrapper );
+    this.stage.addChild( this.health_bar );
+
+};
+
+game_animator.prototype.destroy = function() {
+
+    this.stage.removeChild( this.feet_sprite );
+    this.stage.removeChild( this.body_sprite );
+    this.stage.removeChild( this.health_bar_wrapper );
+    this.stage.removeChild( this.health_bar );
+
+    if ( this.debug ) {
+
+        this.stage.removeChild( this.debug_position );
+
+    }
 
 };
 
@@ -61,6 +70,13 @@ game_animator.prototype.update = function( dt ) {
 
     this.body_sprite.x = camera_position.x;
     this.body_sprite.y = camera_position.y;
+
+    this.health_bar_wrapper.x = camera_position.x - ( this.health_bar_width / 2 ) - this.health_bar_margin; 
+    this.health_bar_wrapper.y = camera_position.y + this.health_bar_offset;
+
+    this.health_bar.x = camera_position.x - ( this.health_bar_width / 2 );
+    this.health_bar.y = camera_position.y + this.health_bar_offset + this.health_bar_margin;
+    this.health_bar.scaleX = this.avatar.health / this.avatar.max_health;
 
     if ( this.debug ) {
 

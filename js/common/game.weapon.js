@@ -115,12 +115,10 @@
 
         this.reload_duration = 1000; // ms
 
-        this.bullet_radius = 1;
+        this.bullet_hitbox_radius = 3;
         this.bullet_speed = 10;
-        this.bullet_distance_to_live = 50;
+        this.bullet_distance_to_live = 7;
         this.bullet_damage = 10;
-
-        this.particles = {};
 
     };
 
@@ -132,18 +130,18 @@
         this.state = this.STATES.shooting;
         this.action_timeout = this.shot_duration;
 
-        var particle = new game_particle.bullet(
+        game_particle.register( new game_particle.bullet(
                 null, 
+                this.owner,
                 timestamp, 
                 this.owner.position,
                 this.owner.direction,
 
-                this.bullet_radius,
+                this.bullet_hitbox_radius,
                 this.bullet_speed,
                 this.bullet_distance_to_live,
-                this.bullet_damage );
-        this.particles[particle.id] = particle;
-    
+                this.bullet_damage ) );
+        
     }
 
     e.handgun.prototype.end_primary_action = function( timestamp ) {
@@ -166,14 +164,9 @@
 
     e.handgun.prototype.snapshot = function() {
         
-        var p_snap = [];
-        for ( particle_id in this.particles )
-            p_snap.push( this.particles[particle_id].snapshot() );
-
         return { 
             name: this.name,
             s: this.state,
-            ps: p_snap,
         };
 
     };
@@ -182,34 +175,6 @@
 
         this.state = snapshot.s;
 
-        for ( var p_i in snapshot.ps ) {
-
-            var particle = snapshot.ps[p_i];
-
-            if ( !this.particles[particle.id] )
-                this.particles[particle.id] = new game_particle.bullet(
-                        particle.id,
-                        null,
-                        particle.p,
-                        null,
-                        this.bullet_radius,
-                        null,
-                        null,
-                        null );
-
-            this.particles[particle.id].position = { 
-                x: particle.p.x,
-                y: particle.p.y,
-            };
-
-        }
-
-        for ( var particle_id in this.particles ) {
-
-            if ( !snapshot.ps[particle_id] )
-                delete this.particles[particle_id];
-
-        }
     };
 
     e.handgun.prototype.update = function( dt ) {
@@ -217,14 +182,8 @@
         if ( this.action_timeout > 0 )
             this.action_timeout -= dt;
 
-        for ( particle_id in this.particles ) {
-
-            this.particles[particle_id].update( dt );
-
-            if ( !this.particles[particle_id].is_alive() )
-                delete this.particles[particle_id];
-
-        }
+        if ( this.state != this.STATES.idle && this.action_timeout <= 0 )
+            this.state = this.STATES.idle;
 
     };
 

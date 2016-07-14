@@ -1,4 +1,6 @@
 ( function( e ) {
+
+    e.avatars = {};
     
     /*
      * The avatar class
@@ -12,7 +14,7 @@
         this.base_speed = 2.8; // m/s
 
         this.max_health = 100;
-        this.health = this.max_health;
+        this.health = this.max_health / 3;
 
         this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ) ];
         this.equiped_weapon = this.inventory[0];
@@ -29,6 +31,9 @@
         // Degrees in radians between the line ((0, 0), (1, 0)) and the 
         // looking direction of the avatar
         this.direction = 0;
+
+        // Physics variables
+        this.hitbox = { x: 0, y: 0, radius: 20 };
 
     }; //game_avatar.constructor
 
@@ -76,7 +81,10 @@
     e.game_avatar.prototype.set_position = function( x, y ) {
 
         this.position.x = x;
-        this.position.y = y
+        this.position.y = y;
+
+        this.hitbox.x = x;
+        this.hitbox.y = y;
 
     };
 
@@ -113,9 +121,21 @@
         };
 
         var new_position = f.v_add( this.position, absolute_movement );
+        var old_position = { x: this.position.x, y: this.position.y };
         
         this.set_position( new_position.x, new_position.y );
 
+        // Check for collisions
+        for ( player_id in e.avatars ) {
+
+            if ( e.avatars[player_id] !== this && f.are_colliding_circles( this.hitbox, e.avatars[player_id].hitbox ) ) {
+                // Collision
+                this.set_position( old_position.x, old_position.y );
+            }
+
+        };
+        
+        
         // Update equipment of the avatar
         if ( this.equiped_weapon !== null ) {
 

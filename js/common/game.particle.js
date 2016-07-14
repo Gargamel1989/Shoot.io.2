@@ -1,13 +1,24 @@
 ( function( e ) {
 
-    e.bullet = function( id, creation_time, origin, direction, radius, speed, distance_to_live, damage ) {
+    e.world_particles = {};
+
+    e.register = function( particle ) {
+
+        e.world_particles[ particle.id ] = particle;
+
+    };
+
+
+
+    e.bullet = function( id, creation_time, shot_by, origin, direction, hitbox_radius, speed, distance_to_live, damage ) {
         
         this.id = id || UUID();
+        this.shot_by = shot_by;
         this.creation_time = creation_time; 
         this.origin = origin;
         this.direction = direction;
 
-        this.radius = radius;
+        this.hitbox_radius = hitbox_radius;
         this.speed = speed;
         this.distance_to_live = distance_to_live;
         this.damage = damage;
@@ -18,7 +29,7 @@
 
     e.bullet.prototype.is_alive = function() {
         
-        return f.v_mag( f.v_sub( this.position, this.origin ) ) <= this.distance_to_live;
+        return f.v_mag( f.v_sub( this.position, this.origin ) ) <= ( this.distance_to_live * g.pixels_per_m );
 
     };
 
@@ -28,10 +39,10 @@
             x: Math.cos( this.direction ),
             y: Math.sin( this.direction ),
         };
-        this.movement_vector = f.v_mul_scalar( this.movement_vector, this.speed * dt / 1000 );
+        this.movement_vector = f.v_mul_scalar( this.movement_vector, this.speed * g.pixels_per_m * dt / 1000 );
 
         this.position = f.v_add( this.position, this.movement_vector );
-        console.log('Bullet at ' + this.position.x + ', ' + this.position.y );
+        
     };
 
     e.bullet.prototype.snapshot = function() {
@@ -39,7 +50,14 @@
         return {
             id: this.id,
             p: this.position,
+            r: this.hitbox_radius,
         };
+
+    };
+
+    e.bullet.prototype.update_from_snapshot = function( snapshot ) {
+
+        this.position = snapshot.p;
 
     };
 

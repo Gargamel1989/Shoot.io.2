@@ -2,13 +2,35 @@
 
     e.game_core = function() {
 
-        this.avatars = {};
+        this.avatars = game_avatar.avatars;
 
     };
 
     e.game_core.prototype.add_avatar = function( player_id ) {
 
-        this.avatars[player_id] = new game_avatar.game_avatar();
+        var avatar = new game_avatar.game_avatar();
+        this.avatars[player_id] = avatar;
+
+        var collision = true;
+
+        while ( collision ) {
+        
+            avatar.set_position( 300 * Math.random(), 300 * Math.random() );
+
+            collision = false;
+
+            for ( player_id in this.avatars ) {
+
+                if ( avatar !== this.avatars[player_id] && f.are_colliding_circles( avatar.hitbox, this.avatars[player_id].hitbox ) ) {
+
+                    collision = true;
+                    break;
+
+                }
+
+            }
+            
+        }
 
         return this.avatars[player_id];
 
@@ -107,19 +129,37 @@
 
     e.game_core.prototype.update_world_from_snapshot = function( world_snapshot ) {
         
-        for ( var player_id in world_snapshot ) {
+        for ( var player_id in world_snapshot.players ) {
 
             if ( !this.avatars[player_id] )
                 this.add_avatar( player_id );
             
-            this.avatars[player_id].update_from_snapshot( world_snapshot[player_id] );
+            this.avatars[player_id].update_from_snapshot( world_snapshot.players[player_id] );
             
         }
 
         for ( var player_id in this.avatars ) {
 
-            if ( !world_snapshot[player_id] )
+            if ( !world_snapshot.players[player_id] )
                 delete this.avatars[player_id];
+
+        }
+
+        for ( var particle_id in world_snapshot.particles ) {
+
+            var p = world_snapshot.particles[particle_id];
+
+            if ( !game_particle.world_particles[particle_id] )
+                game_particle.register( new game_particle.bullet( p.id, null, null, p.p, null, p.r, null, null, null ) );
+
+            game_particle.world_particles[particle_id].update_from_snapshot( p );
+
+        }
+
+        for ( var particle_id in game_particle.world_particles ) {
+
+            if ( !world_snapshot.particles[particle_id] )
+                delete game_particle.world_particles[particle_id];
 
         }
 
@@ -130,14 +170,29 @@
         for ( var player_id in this.avatars )
             this.avatars[player_id].update( dt );
 
+        for ( var particle_id in game_particle.world_particles ) {
+
+            game_particle.world_particles[particle_id].update( dt );
+
+            if ( !game_particle.world_particles[particle_id].is_alive() )
+                delete game_particle.world_particles[particle_id];
+
+        }
+
     };
 
     e.game_core.prototype.world_snapshot = function() {
        
-        var snapshot = {};
+        var snapshot = {
+            players: {},
+            particles: {}
+        };
 
         for ( var player_id in this.avatars )
-            snapshot[player_id] = this.avatars[player_id].snapshot();
+            snapshot.players[player_id] = this.avatars[player_id].snapshot();
+
+        for ( var particle_id in game_particle.world_particles )
+            snapshot.particles[particle_id] = game_particle.world_particles[particle_id].snapshot();
 
         return snapshot;
 
