@@ -4,6 +4,11 @@
 
         this.avatars = game_avatar.avatars;
 
+        this.world_size = {
+            width: 1292,
+            height: 770,
+        };
+
     };
 
     e.game_core.prototype.add_avatar = function( player_id ) {
@@ -11,7 +16,9 @@
         var avatar = new game_avatar.game_avatar();
         this.avatars[player_id] = avatar;
 
-		this.move_to_random_position( avatar );
+        this.move_to_random_position( avatar );
+
+        return avatar;
 
     };
 
@@ -21,7 +28,7 @@
 
         while ( collision ) {
 
-            avatar.set_position( 300 * Math.random(), 300 * Math.random() );
+            avatar.set_position( this.world_size.width * Math.random(), this.world_size.height * Math.random() );
 
             collision = false;
 

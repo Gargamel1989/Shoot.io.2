@@ -6,19 +6,32 @@ var game_camera = function( game_core, debug ) {
     var body = document.getElementsByTagName( 'body' )[0];
     
 
-    this.viewport = document.getElementById( 'viewport' );
+    this.canvas = document.getElementById( 'canvas' );
     
     // Viewport size
-    this.viewport_size = {
+    this.viewport_scale = {
         width: 1280,
         height: 960,
     };
-    //this.viewport.style.width = this.viewport_size.width + 'px';
-    //this.viewport.style.height = this.viewport_size.height + 'px';
-    
-    this.stage = new createjs.Stage( this.viewport );
+    this.viewport_size = {
+        width: this.viewport_scale.width,
+        height: this.viewport_scale.height,
+    };
 
-    this.setup_viewport();
+    this.viewport_margins = {
+        x: 20,
+        y: 20,
+    };
+    
+    this.stage = new createjs.Stage( this.canvas );
+
+    this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
+    this.stage.addChild( this.map );
+
+    this.viewport = new createjs.Shape();
+    this.map.mask = this.viewport;
+
+    this.resize_viewport();
 
     this.world_position = { x: 0, y: 0 };
 
@@ -26,20 +39,25 @@ var game_camera = function( game_core, debug ) {
 
     this.animators = {};
 
-    this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
-    this.stage.addChild( this.map );
-
 	this.particle_sprites = {};
 
 };
 
-game_camera.prototype.setup_viewport = function() {
+game_camera.prototype.resize_viewport = function() {
     
     var window_w = window.innerWidth;
     var window_h = window.innerHeight;
 
-    this.viewport.width = window_w;
-    this.viewport.height = window_h;
+    this.canvas.width = window_w;
+    this.canvas.height = window_h;
+
+    var viewport_bestfit_scale = Math.min( ( window_w - ( 2 * this.viewport_margins.x ) ) / this.viewport_scale.width, ( window_h - ( 2 * this.viewport_margins.y ) ) / this.viewport_scale.height );
+    this.viewport_size = {
+        width: this.viewport_scale.width * viewport_bestfit_scale,
+        height: this.viewport_scale.height * viewport_bestfit_scale,
+    };
+    
+    this.viewport.graphics.clear().f( 'red' ).dr( ( window_w / 2 ) - ( this.viewport_size.width / 2 ), ( window_h / 2 ) - ( this.viewport_size.height / 2 ), this.viewport_size.width, this.viewport_size.height );
 
 };
 
@@ -81,11 +99,11 @@ game_camera.prototype.update = function( dt ) {
     
     if ( this.object_to_follow !== null ) {
 
-        this.world_position.x = this.object_to_follow.position.x - ( this.viewport_size.width / 2 );
-        this.world_position.y = this.object_to_follow.position.y - ( this.viewport_size.height / 2 );
+        this.world_position.x = this.object_to_follow.position.x - ( this.canvas.width / 2 );
+        this.world_position.y = this.object_to_follow.position.y - ( this.canvas.height / 2 );
 
     }
-
+    
     // Map is always at world coordinates 0, 0
     var map_camera_pos = this.world_to_camera_coordinates( 0, 0 );
     this.map.x = map_camera_pos.x;
