@@ -1,5 +1,7 @@
 ( function( e ) {
 
+    e.environment = [];
+
     e.avatars = {};
     
     /*
@@ -33,7 +35,7 @@
         this.direction = 0;
 
         // Physics variables
-        this.hitbox = { x: 0, y: 0, radius: 20 };
+        this.hitbox = { x: 0, y: 0, r: 20 };
 
     }; //game_avatar.constructor
 
@@ -144,15 +146,38 @@
         this.set_position( new_position.x, new_position.y );
 
         // Check for collisions
+        var collided = false;
+        
         for ( player_id in e.avatars ) {
 
-            if ( e.avatars[player_id] !== this && f.are_colliding_circles( this.hitbox, e.avatars[player_id].hitbox ) ) {
+            if ( e.avatars[player_id] !== this && f.collision_test_circles( this.hitbox, e.avatars[player_id].hitbox ) ) {
+                
                 // Collision
                 this.set_position( old_position.x, old_position.y );
+
+                collided = true;
+
             }
 
         };
-        
+
+        if ( !collided ) {
+
+            for ( env_i in e.environment ) {
+
+                var env_obj = e.environment[env_i];
+
+                if ( f.collision_test_circle_rect( this.hitbox, env_obj ) ) {
+
+                    this.set_position( old_position.x, old_position.y );
+
+                    collided = true;
+
+                }
+
+            }
+
+        }
         
         // Update equipment of the avatar
         if ( this.equiped_weapon !== null ) {

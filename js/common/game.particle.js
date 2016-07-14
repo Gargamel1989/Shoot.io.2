@@ -24,7 +24,7 @@
         this.damage = damage;
 
         this.position = { x: this.origin.x, y: this.origin.y };
-        this.hitbox = { x: this.position.x, y: this.position.x, radius: this.hitbox_radius }
+        this.hitbox = { x: this.position.x, y: this.position.x, r: this.hitbox_radius }
 
         this.movement_direction_vector = { 
             x: Math.cos( this.direction ),

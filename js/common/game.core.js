@@ -2,12 +2,22 @@
 
     e.game_core = function() {
 
+        this.environment = game_avatar.environment;
+
         this.avatars = game_avatar.avatars;
 
         this.world_size = {
             width: 1292,
             height: 770,
         };
+
+        // Create world boundaries
+        this.environment.push(
+            { x: -1, y: -1, w: 1, h: this.world_size.height },
+            { x: this.world_size.width, y: -1, w: 1, h: this.world_size.height },
+            { x: -1, y: -1, w: this.world_size.width, h: 1 },
+            { x: -1, y: this.world_size.height, w: this.world_size.width, h: 1 }
+        )
 
     };
 
@@ -32,9 +42,25 @@
 
             collision = false;
 
-            for ( player_id in this.avatars ) {
+            for ( var player_id in this.avatars ) {
 
-                if ( avatar !== this.avatars[player_id] && f.are_colliding_circles( avatar.hitbox, this.avatars[player_id].hitbox ) ) {
+                if ( avatar !== this.avatars[player_id] && f.collision_test_circles( avatar.hitbox, this.avatars[player_id].hitbox ) ) {
+
+                    collision = true;
+                    break;
+
+                }
+
+            }
+
+            if ( collision )
+                break;
+
+            for ( var env_i in this.environment ) {
+    
+                var env_obj = this.environment[env_i];
+
+                if ( f.collision_test_circle_rect( avatar.hitbox, env_obj ) ) {
 
                     collision = true;
                     break;
@@ -201,7 +227,7 @@
 
             for ( player_id in this.avatars ) {
 
-                if ( particle.shot_by !== this.avatars[player_id] && f.are_colliding_circles( particle.hitbox, this.avatars[player_id].hitbox ) )
+                if ( particle.shot_by !== this.avatars[player_id] && f.collision_test_circles( particle.hitbox, this.avatars[player_id].hitbox ) )
                     particle.hit( this.avatars[player_id] );
             
             }

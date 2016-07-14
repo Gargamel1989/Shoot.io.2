@@ -28,6 +28,22 @@ var game_camera = function( game_core, debug ) {
     this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
     this.stage.addChild( this.map );
 
+    if ( this.debug ) {
+
+        this.debug_env_sprites = [];
+
+        for ( env_i in this.core.environment ) {
+
+            var env_obj = this.core.environment[env_i];
+            var env_sprite = new createjs.Shape();
+            env_sprite.graphics.clear().f( 'purple' ).dr( 0, 0, env_obj.w, env_obj.h );
+            this.debug_env_sprites.push( env_sprite );
+            this.stage.addChild( env_sprite );
+
+        }
+
+    } 
+
     this.viewport = new createjs.Shape();
     this.map.mask = this.viewport;
 
@@ -163,6 +179,16 @@ game_camera.prototype.update = function( dt ) {
     }
 
     if ( this.debug ) {
+
+        for ( env_i in this.debug_env_sprites ) {
+            
+            var env_obj = this.core.environment[env_i];
+            var cam_pos = this.world_to_camera_coordinates( env_obj.x, env_obj.y );
+            this.debug_env_sprites[env_i].x = cam_pos.x;
+            this.debug_env_sprites[env_i].y = cam_pos.y;
+
+        }
+            
 
         if ( this.weapon_text.text != this.object_to_follow.equiped_weapon.name )
             this.weapon_text.text = this.object_to_follow.equiped_weapon.name;
