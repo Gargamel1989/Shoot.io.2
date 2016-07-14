@@ -172,10 +172,22 @@
 
         for ( var particle_id in game_particle.world_particles ) {
 
-            game_particle.world_particles[particle_id].update( dt );
+            var particle = game_particle.world_particles[particle_id];
+            
+            particle.update( dt );
+
+            for ( player_id in this.avatars ) {
+
+                if ( f.are_colliding_circles( particle.hitbox, this.avatars[player_id] ) ) {
+                    console.log('try');
+                    particle.hit( this.avatars[player_id] );
+                }
+            
+            }
 
             if ( !game_particle.world_particles[particle_id].is_alive() )
                 delete game_particle.world_particles[particle_id];
+            
 
         }
 

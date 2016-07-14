@@ -24,25 +24,50 @@
         this.damage = damage;
 
         this.position = { x: this.origin.x, y: this.origin.y };
+        this.hitbox = { x: this.position.x, y: this.position.x, radius: this.hitbox_radius }
+
+        this.movement_direction_vector = { 
+            x: Math.cos( this.direction ),
+            y: Math.sin( this.direction ),
+        };
+
+        this.has_hit = false;
+
+    };
+
+    e.bullet.prototype.hit = function( target ) {
+console.log('hit');
+        target.damage( this.damage );
+        this.has_hit = true;
 
     };
 
     e.bullet.prototype.is_alive = function() {
         
-        return f.v_mag( f.v_sub( this.position, this.origin ) ) <= ( this.distance_to_live * g.pixels_per_m );
+        return ( this.has_hit || f.v_mag( f.v_sub( this.position, this.origin ) ) <= ( this.distance_to_live * g.pixels_per_m ) );
 
     };
 
     e.bullet.prototype.update = function( dt ) {
         
-        this.movement_vector = { 
-            x: Math.cos( this.direction ),
-            y: Math.sin( this.direction ),
-        };
-        this.movement_vector = f.v_mul_scalar( this.movement_vector, this.speed * g.pixels_per_m * dt / 1000 );
+        var new_position = f.v_add( this.position, f.v_mul_scalar( this.movement_direction_vector, this.speed * g.pixels_per_m * dt / 1000 ) );
 
-        this.position = f.v_add( this.position, this.movement_vector );
+        // If this updates takes us over our distance to live, set our position to our distance to live
+        if ( f.v_mag( f.v_sub( new_position, this.origin ) ) > ( this.distance_to_live * g.pixels_per_m ) )
+            new_position = f.v_add( this.origin, f.v_mul_scalar( this.movement_direction_vector, this.distance_to_live * g.pixels_per_m ) );
+
+        this.set_position( new_position.x, new_position.y );
         
+    };
+
+    e.bullet.prototype.set_position = function( x, y ) {
+
+        this.position.x = x;
+        this.position.y = y;
+
+        this.hitbox.x = x;
+        this.hitbox.y = y;
+
     };
 
     e.bullet.prototype.snapshot = function() {
