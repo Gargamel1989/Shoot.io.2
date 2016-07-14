@@ -62,7 +62,6 @@
             timestamp,
             this.owner,
 
-            { x: 10, y: 0 },
             20,
             1000,
             30 ) );
@@ -125,16 +124,21 @@
         this.STATES = {
             idle: 'idle',
             shooting: 'shooting',
+            blanking: 'blanking',
             reloading: 'reloading',
         };
         this.state = this.STATES.idle;
         this.action_timeout = 0;
 
-        this.shot_duration = 100; // ms
+        this.max_loaded_ammo = 12;
+        this.loaded_ammo = this.max_loaded_ammo;
+        this.extra_ammo = 0;
 
+        this.shot_duration = 300; // ms
+        this.blank_duration = 100;
         this.reload_duration = 1000; // ms
 
-        this.bullet_hitbox_radius = 3;
+        this.bullet_hitbox_radius = 2;
         this.bullet_speed = 10;
         this.bullet_distance_to_live = 7;
         this.bullet_damage = 10;
@@ -146,10 +150,12 @@
         if ( this.state != this.STATES.idle )
             return;
 
-        this.state = this.STATES.shooting;
-        this.action_timeout = this.shot_duration;
+        if ( this.loaded_ammo > 0 ) {
 
-        game_particle.register( new game_particle.bullet(
+            this.state = this.STATES.shooting;
+            this.action_timeout = this.shot_duration;
+    
+            game_particle.register( new game_particle.bullet(
                 null, 
                 timestamp, 
                 this.owner,
@@ -160,7 +166,16 @@
                 this.bullet_speed,
                 this.bullet_distance_to_live,
                 this.bullet_damage ) );
-        
+            
+            this.loaded_ammo--;
+            
+        } else {
+
+            this.state = this.STATES.blanking;
+            this.action_timeout = this.blank_duration;
+
+        }
+
     }
 
     e.handgun.prototype.end_primary_action = function( timestamp ) {
@@ -172,8 +187,25 @@
         if ( this.state != this.STATES.idle )
             return;
 
+        if ( this.extra_ammo <= 0 )
+            return;
+
         this.state = this.STATES.reloading;
         this.action_timeout = this.reload_duration;
+
+        var ammo_needed = this.max_loaded_ammo - this.loaded_ammo;
+
+        if ( this.extra_ammo > ammo_needed ) {
+
+            this.loaded_ammo = this.max_loaded_ammo;
+            this.extra_ammo -= ammo_needed;
+
+        } else {
+
+            this.loaded_ammo += this.extra_ammo;
+            this.extra_ammo = 0;
+
+        }
 
     }
 
@@ -225,16 +257,20 @@
         this.state = this.STATES.idle;
         this.action_timeout = 0;
 
-        this.shot_duration = 100; // ms
+        this.max_loaded_ammo = 2;
+        this.loaded_ammo = this.max_loaded_ammo;
+        this.extra_ammo = 0;
 
-        this.reload_duration = 1000; // ms
+        this.shot_duration = 800; // ms
+        this.blank_duration = 100;
+        this.reload_duration = 2000; // ms
 
         this.bullet_count = 20;
         this.bullet_spray_range = Math.PI / 4;
         this.bullet_speed_range = 0.2;
         this.bullet_hitbox_radius = 1;
         this.bullet_speed = 10;
-        this.bullet_distance_to_live = 2;
+        this.bullet_time_to_live = 250;
         this.bullet_damage = 3;
 
     };
@@ -244,25 +280,36 @@
         if ( this.state != this.STATES.idle )
             return;
 
-        this.state = this.STATES.shooting;
-        this.action_timeout = this.shot_duration;
+        if ( this.loaded_ammo > 0 ) {
 
-        for ( var i = 0; i < this.bullet_count; i++ ) {
+            this.state = this.STATES.shooting;
+            this.action_timeout = this.shot_duration;
+    
+            for ( var i = 0; i < this.bullet_count; i++ ) {
 
-            var random_direction = this.owner.direction + ( this.bullet_spray_range * ( Math.random() - 0.5 ) );
-            var random_speed = this.bullet_speed * ( 1 - ( this.bullet_speed_range * Math.random() ) )
+                var random_direction = this.owner.direction + ( this.bullet_spray_range * ( Math.random() - 0.5 ) );
+                var random_speed = this.bullet_speed * ( 1 - ( this.bullet_speed_range * Math.random() ) )
 
-            game_particle.register( new game_particle.bullet(
-                null, 
-                timestamp, 
-                this.owner,
-                this.owner.position,
-                random_direction,
+                game_particle.register( new game_particle.shrapnel(
+                    null, 
+                    timestamp, 
+                    this.owner,
+                    this.owner.position,
+                    random_direction,
 
-                this.bullet_hitbox_radius,
-                random_speed,
-                this.bullet_distance_to_live,
-                this.bullet_damage ) );
+                    this.bullet_hitbox_radius,
+                    random_speed,
+                    this.bullet_time_to_live,
+                    this.bullet_damage ) );
+
+            };
+
+            this.loaded_ammo--;
+            
+        } else {
+
+            this.state = this.STATES.blanking;
+            this.action_timeout = this.blank_duration;
 
         };
         
@@ -277,8 +324,25 @@
         if ( this.state != this.STATES.idle )
             return;
 
+        if ( this.extra_ammo <= 0 )
+            return;
+
         this.state = this.STATES.reloading;
         this.action_timeout = this.reload_duration;
+
+        var ammo_needed = this.max_loaded_ammo - this.loaded_ammo;
+
+        if ( this.extra_ammo > ammo_needed ) {
+
+            this.loaded_ammo = this.max_loaded_ammo;
+            this.extra_ammo -= ammo_needed;
+
+        } else {
+
+            this.loaded_ammo += this.extra_ammo;
+            this.extra_ammo = 0;
+
+        }
 
     }
 

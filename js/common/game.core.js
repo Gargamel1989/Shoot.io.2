@@ -186,10 +186,29 @@
 
             var p = world_snapshot.particles[particle_id];
 
-            if ( !game_particle.world_particles[particle_id] )
-                game_particle.register( new game_particle.bullet( p.id, null, null, p.p, null, p.r, null, null, null ) );
+            if ( !game_particle.world_particles[particle_id] ) {
 
-            game_particle.world_particles[particle_id].update_from_snapshot( p );
+                switch ( p.type ) {
+
+                    case 'Slash':
+                        game_particle.register( new game_particle.slash.create_from_snapshot( p ) );
+                        break;
+
+                    case 'Bullet':
+                        game_particle.register( new game_particle.bullet.create_from_snapshot( p ) );
+                        break;
+
+                    case 'Shrapnel':
+                        game_particle.register( new game_particle.shrapnel.create_from_snapshot( p ) );
+                        break;
+
+                }
+
+            } else {
+
+                game_particle.world_particles[particle_id].update_from_snapshot( p );
+
+            }
 
         }
 
@@ -227,7 +246,7 @@
 
             for ( player_id in this.avatars ) {
 
-                if ( particle.shot_by !== this.avatars[player_id] && f.collision_test_circles( particle.hitbox, this.avatars[player_id].hitbox ) )
+                if ( particle.owner !== this.avatars[player_id] && f.collision_test_circles( particle.hitbox, this.avatars[player_id].hitbox ) )
                     particle.hit( this.avatars[player_id] );
             
             }

@@ -153,10 +153,30 @@ game_camera.prototype.update = function( dt ) {
 
         if ( !this.particle_sprites[particle_id] ) {
 
-            this.particle_sprites[particle_id] = new createjs.Shape();
-            this.particle_sprites[particle_id].graphics.clear().f( 'white' ).dc( 0, 0, particle.hitbox_radius );
+            switch ( particle.type ) {
 
-            this.stage.addChild( this.particle_sprites[particle_id] );
+                case 'Slash':
+
+                    if ( this.debug ) {
+
+                        this.particle_sprites[particle_id] = new createjs.Shape();
+                        this.particle_sprites[particle_id].graphics.clear().f( 'white' ).dc( 0, 0, particle.hitbox_radius );
+
+                        this.stage.addChild( this.particle_sprites[particle_id] );
+
+                    }
+                    break;
+
+                case 'Bullet':
+                case 'Shrapnel':
+
+                    this.particle_sprites[particle_id] = new createjs.Shape();
+                    this.particle_sprites[particle_id].graphics.clear().f( 'black' ).dc( 0, 0, particle.hitbox_radius );
+
+                    this.stage.addChild( this.particle_sprites[particle_id] );
+                    break;
+
+            }
 
         }
 
