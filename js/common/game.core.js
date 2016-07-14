@@ -11,10 +11,16 @@
         var avatar = new game_avatar.game_avatar();
         this.avatars[player_id] = avatar;
 
-        var collision = true;
+		this.move_to_random_position( avatar );
+
+    };
+
+    e.game_core.prototype.move_to_random_position = function( avatar ) {
+		
+		var collision = true;
 
         while ( collision ) {
-        
+
             avatar.set_position( 300 * Math.random(), 300 * Math.random() );
 
             collision = false;
@@ -29,10 +35,8 @@
                 }
 
             }
-            
-        }
 
-        return this.avatars[player_id];
+        }
 
     };
 
@@ -167,8 +171,20 @@
 
     e.game_core.prototype.update = function( dt ) {
 
-        for ( var player_id in this.avatars )
-            this.avatars[player_id].update( dt );
+        for ( var player_id in this.avatars ) {
+
+            var avatar = this.avatars[player_id];
+
+            avatar.update( dt );
+
+            if ( !avatar.is_alive() ) {
+
+                avatar.reset();
+                this.move_to_random_position( avatar );
+
+            }
+
+        }
 
         for ( var particle_id in game_particle.world_particles ) {
 
@@ -178,10 +194,8 @@
 
             for ( player_id in this.avatars ) {
 
-                if ( f.are_colliding_circles( particle.hitbox, this.avatars[player_id] ) ) {
-                    console.log('try');
+                if ( particle.shot_by !== this.avatars[player_id] && f.are_colliding_circles( particle.hitbox, this.avatars[player_id].hitbox ) )
                     particle.hit( this.avatars[player_id] );
-                }
             
             }
 

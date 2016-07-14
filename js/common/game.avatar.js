@@ -14,7 +14,7 @@
         this.base_speed = 2.8; // m/s
 
         this.max_health = 100;
-        this.health = this.max_health / 3;
+        this.health = this.max_health;
 
         this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ) ];
         this.equiped_weapon = this.inventory[0];
@@ -36,6 +36,24 @@
         this.hitbox = { x: 0, y: 0, radius: 20 };
 
     }; //game_avatar.constructor
+
+    e.game_avatar.prototype.damage = function( amount ) {
+        
+        this.health = Math.max( 0, this.health - amount );
+
+    };
+
+    e.game_avatar.prototype.is_alive = function() {
+
+        return this.health > 0;
+
+    };
+
+    e.game_avatar.prototype.reset = function() {
+        
+        this.health = this.max_health;
+
+    };
 
     e.game_avatar.prototype.set_input_vector = function( timestamp, input_vector ) {
         
@@ -164,6 +182,7 @@
         
         this.position = snapshot.p;
         this.direction = snapshot.d;
+        this.health = snapshot.h;
         if ( this.equiped_weapon.name == snapshot.w.name )
             this.equiped_weapon.update_from_snapshot( snapshot.w );
         else
@@ -176,6 +195,7 @@
         return {
             p: this.position,
             d: this.direction,
+            h: this.health,
             w: this.equiped_weapon.snapshot(),
         };
 

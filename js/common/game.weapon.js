@@ -132,8 +132,8 @@
 
         game_particle.register( new game_particle.bullet(
                 null, 
-                this.owner,
                 timestamp, 
+                this.owner,
                 this.owner.position,
                 this.owner.direction,
 

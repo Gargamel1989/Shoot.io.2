@@ -13,8 +13,8 @@
     e.bullet = function( id, creation_time, shot_by, origin, direction, hitbox_radius, speed, distance_to_live, damage ) {
         
         this.id = id || UUID();
-        this.shot_by = shot_by;
         this.creation_time = creation_time; 
+        this.shot_by = shot_by;
         this.origin = origin;
         this.direction = direction;
 
@@ -32,19 +32,20 @@
         };
 
         this.has_hit = false;
+        this.has_faded = false;
 
     };
 
     e.bullet.prototype.hit = function( target ) {
-console.log('hit');
+
         target.damage( this.damage );
         this.has_hit = true;
 
     };
 
     e.bullet.prototype.is_alive = function() {
-        
-        return ( this.has_hit || f.v_mag( f.v_sub( this.position, this.origin ) ) <= ( this.distance_to_live * g.pixels_per_m ) );
+
+        return ( !this.has_hit && !this.has_faded );
 
     };
 
@@ -53,9 +54,13 @@ console.log('hit');
         var new_position = f.v_add( this.position, f.v_mul_scalar( this.movement_direction_vector, this.speed * g.pixels_per_m * dt / 1000 ) );
 
         // If this updates takes us over our distance to live, set our position to our distance to live
-        if ( f.v_mag( f.v_sub( new_position, this.origin ) ) > ( this.distance_to_live * g.pixels_per_m ) )
+        if ( f.v_mag( f.v_sub( new_position, this.origin ) ) > ( this.distance_to_live * g.pixels_per_m ) ) {
+
             new_position = f.v_add( this.origin, f.v_mul_scalar( this.movement_direction_vector, this.distance_to_live * g.pixels_per_m ) );
 
+            this.has_faded = true;
+
+        }
         this.set_position( new_position.x, new_position.y );
         
     };
