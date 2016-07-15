@@ -49,14 +49,13 @@ game_ui.prototype.update = function( dt ) {
 
         this.weapon_name_text.text = e.name;
 
-        if ( e.loaded_ammo ) {
+        if ( e.loaded_ammo !== undefined ) {
 
-            this.weapon_ammo_text.text = e.loaded_ammo + '/' + e.max_loaded_ammo + '(' + e.extra_ammo + ')';
-            this.weapon_ammo_text.text = e.name
+            this.weapon_ammo_text.text = e.loaded_ammo + '/' + e.max_loaded_ammo + ' (' + e.extra_ammo + ')';
 
         } else {
 
-            this.weapon_ammo_text = '';
+            this.weapon_ammo_text.text = '';
 
         }
 

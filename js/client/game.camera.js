@@ -4,7 +4,6 @@ var game_camera = function( game_core, debug ) {
     this.debug = debug || true;
 
     var body = document.getElementsByTagName( 'body' )[0];
-    
 
     this.canvas = document.getElementById( 'canvas' );
     
@@ -55,6 +54,7 @@ var game_camera = function( game_core, debug ) {
 
     this.object_to_follow = null;
 
+    this.objects = {};
     this.animators = {};
 
 	this.particle_sprites = {};
@@ -106,16 +106,6 @@ game_camera.prototype.follow = function( object_to_follow ) {
 
     this.ui.set_player_avatar( object_to_follow );
 
-    if ( this.debug ) {
-
-        this.weapon_text = new createjs.Text( this.object_to_follow.equiped_weapon.name, "20px Arial", "#F00" );
-        this.weapon_text.x = 10;
-        this.weapon_text.y = 10;
-        
-        this.stage.addChild( this.weapon_text );
-
-    }
-
 };
 
 game_camera.prototype.update = function( dt ) {
@@ -131,6 +121,51 @@ game_camera.prototype.update = function( dt ) {
     var map_camera_pos = this.world_to_camera_coordinates( 0, 0 );
     this.map.x = map_camera_pos.x;
     this.map.y = map_camera_pos.y;
+
+    for ( var object_id in this.core.objects ) {
+
+        var object = this.core.objects[object_id];
+
+        if ( !this.objects[object_id] ) {
+
+            if ( object.type == game_object.TYPES.handgun )
+                this.objects[object_id] = new createjs.Sprite( assets.getResult( 'weapons' ), 'handgun' );
+
+            else if ( object.type == game_object.TYPES.handgun_ammo )
+                this.objects[object_id] = new createjs.Sprite( assets.getResult( 'ammo' ), 'handgun' );
+
+            else if ( object.type == game_object.TYPES.shotgun )
+                this.objects[object_id] = new createjs.Sprite( assets.getResult( 'weapons' ), 'shotgun' );
+
+            else if ( object.type == game_object.TYPES.shotgun_ammo )
+                this.objects[object_id] = new createjs.Sprite( assets.getResult( 'ammo' ), 'shotgun' );
+
+
+            this.objects[object_id].scaleX = 0.4;
+            this.objects[object_id].scaleY = 0.4;
+
+            this.stage.addChild( this.objects[object_id] );
+
+        }
+        
+        var obj_sprite = this.objects[object_id];
+
+        var cam_pos = this.world_to_camera_coordinates( object.position.x, object.position.y );
+        obj_sprite.x = cam_pos.x;
+        obj_sprite.y = cam_pos.y;
+
+    }
+
+    for ( var object_id in this.objects ) {
+
+        if ( !this.core.objects[object_id] ) {
+
+            this.stage.removeChild( this.objects[object_id] );
+            delete this.objects[object_id];
+
+        }
+
+    }
 
     for ( var player_id in this.core.avatars ) {
         
@@ -217,10 +252,6 @@ game_camera.prototype.update = function( dt ) {
             this.debug_env_sprites[env_i].y = cam_pos.y;
 
         }
-            
-
-        if ( this.weapon_text.text != this.object_to_follow.equiped_weapon.name )
-            this.weapon_text.text = this.object_to_follow.equiped_weapon.name;
 
     }
 

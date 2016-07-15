@@ -1,0 +1,11 @@
+{
+    "images": ["img/sprites/weapons.png"],
+    "frames": [
+        [40, 50, 80, 70, 0, 40, 35],
+        [490, 40, 140, 70, 0, 70, 35]  
+    ],
+    "animations": {
+       "handgun": [0],
+       "shotgun": [1]
+    }
+}

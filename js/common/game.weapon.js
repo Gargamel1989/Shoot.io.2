@@ -138,6 +138,10 @@
         this.blank_duration = 100;
         this.reload_duration = 1000; // ms
 
+        this.bullet_origin_offset = { x: 43, y: 13 };
+        this.bullet_origin_offset_mag = f.v_mag( this.bullet_origin_offset );
+        this.bullet_origin_offset_angle = f.v_angle( this.bullet_origin_offset );
+
         this.bullet_hitbox_radius = 2;
         this.bullet_speed = 10;
         this.bullet_distance_to_live = 7;
@@ -154,12 +158,17 @@
 
             this.state = this.STATES.shooting;
             this.action_timeout = this.shot_duration;
+
+            var origin = {
+                x: this.owner.position.x + this.bullet_origin_offset_mag * Math.cos( this.owner.direction + this.bullet_origin_offset_angle ),
+                y: this.owner.position.y + this.bullet_origin_offset_mag * Math.sin( this.owner.direction + this.bullet_origin_offset_angle ),
+            };
     
             game_particle.register( new game_particle.bullet(
                 null, 
                 timestamp, 
                 this.owner,
-                this.owner.position,
+                origin,
                 this.owner.direction,
 
                 this.bullet_hitbox_radius,
@@ -218,6 +227,8 @@
         return { 
             name: this.name,
             s: this.state,
+            a: this.loaded_ammo,
+            e: this.extra_ammo,
         };
 
     };
@@ -225,6 +236,8 @@
     e.handgun.prototype.update_from_snapshot = function( snapshot ) {
 
         this.state = snapshot.s;
+        this.loaded_ammo = snapshot.a;
+        this.extra_ammo = snapshot.e;
 
     };
 
@@ -265,6 +278,10 @@
         this.blank_duration = 100;
         this.reload_duration = 2000; // ms
 
+        this.bullet_origin_offset = { x: 58, y: 9 };
+        this.bullet_origin_offset_mag = f.v_mag( this.bullet_origin_offset );
+        this.bullet_origin_offset_angle = f.v_angle( this.bullet_origin_offset );
+
         this.bullet_count = 20;
         this.bullet_spray_range = Math.PI / 4;
         this.bullet_speed_range = 0.2;
@@ -284,6 +301,11 @@
 
             this.state = this.STATES.shooting;
             this.action_timeout = this.shot_duration;
+   
+            var origin = {
+                x: this.owner.position.x + this.bullet_origin_offset_mag * Math.cos( this.owner.direction + this.bullet_origin_offset_angle ),
+                y: this.owner.position.y + this.bullet_origin_offset_mag * Math.sin( this.owner.direction + this.bullet_origin_offset_angle ),
+            };
     
             for ( var i = 0; i < this.bullet_count; i++ ) {
 
@@ -294,7 +316,7 @@
                     null, 
                     timestamp, 
                     this.owner,
-                    this.owner.position,
+                    origin,
                     random_direction,
 
                     this.bullet_hitbox_radius,
@@ -355,6 +377,8 @@
         return { 
             name: this.name,
             s: this.state,
+            a: this.loaded_ammo,
+            e: this.extra_ammo,
         };
 
     };
@@ -362,6 +386,8 @@
     e.shotgun.prototype.update_from_snapshot = function( snapshot ) {
 
         this.state = snapshot.s;
+        this.loaded_ammo = snapshot.a;
+        this.extra_ammo = snapshot.e;
 
     };
 

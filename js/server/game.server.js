@@ -4,6 +4,7 @@ game_core       = require( __base + 'js/common/game.core.js' ),
 game_avatar     = require( __base + 'js/common/game.avatar.js' );
 game_weapon     = require( __base + 'js/common/game.weapon.js' );
 game_particle   = require( __base + 'js/common/game.particle.js' );
+game_object     = require( __base + 'js/common/game.object.js' );
 
 UUID            = require( 'node-uuid' );
 
@@ -35,6 +36,7 @@ game_server.start = function() {
             .start();
     
     game_server.log( 'Server startup complete!' );
+
 };
 
 game_server.begin = function( timestamp, delta ) {
@@ -54,6 +56,44 @@ game_server.begin = function( timestamp, delta ) {
 };
 
 game_server.update = function( delta ) {
+
+    // Check for weapon spawns
+    var spawn_chance = game_server.core.weapon_spawn_chance * delta / 1000;
+    spawn_chance *= ( Object.keys( game_server.players ).length * 2 - Object.keys( game_server.core.objects ).length ) / Math.max( 1, Object.keys( game_server.players ).length * 2 );
+
+    if ( Math.random() <= spawn_chance ) {
+        
+        var w = Math.random(),
+            new_weapon;
+
+        if ( w < 0.35 )
+            new_weapon = new game_object.game_object( null, game_object.TYPES.handgun, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+        else if ( w < 0.7 )
+            new_weapon = new game_object.game_object( null, game_object.TYPES.handgun_ammo, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+        else if ( w < 0.85 )
+            new_weapon = new game_object.game_object( null, game_object.TYPES.shotgun, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+        else if ( w < 1 )
+            new_weapon = new game_object.game_object( null, game_object.TYPES.shotgun_ammo, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+        game_server.core.objects[new_weapon.id] = new_weapon;
+
+        game_server.log( new_weapon.type + ' spawn at x: ' + new_weapon.position.x + ' y: ' + new_weapon.position.y );
+    }
 
     // Update the world
     game_server.core.update( delta );

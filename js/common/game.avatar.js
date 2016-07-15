@@ -2,6 +2,8 @@
 
     e.environment = [];
 
+    e.objects = {};
+
     e.avatars = {};
     
     /*
@@ -18,7 +20,7 @@
         this.max_health = 100;
         this.health = this.max_health;
 
-        this.inventory = [ new game_weapon.knife( this ), new game_weapon.handgun( this ), new game_weapon.shotgun( this ) ];
+        this.inventory = [ new game_weapon.knife( this ) ];
         this.equiped_weapon = this.inventory[0];
 
         // Input variables
@@ -93,6 +95,20 @@
                 this.equiped_weapon.start_secondary_action( timestamp );
             else if ( this.input_vector.rmb == 'up' )
                 this.equiped_weapon.end_secondary_action( timestamp );
+
+        }
+
+        if ( this.input_vector.space ) {
+
+            for ( object_id in e.objects ) {
+
+                if ( f.collision_test_circles( this.hitbox, e.objects[object_id].hitbox ) ) {
+
+                    e.objects[object_id].pick_up( this );
+
+                }
+
+            }
 
         }
     

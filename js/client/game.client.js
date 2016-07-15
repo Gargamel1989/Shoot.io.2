@@ -6,6 +6,9 @@ var assets,
         { id: 'body_shotgun', src: 'img/sprites/body_shotgun.json', type: 'spritesheet' },
         { id: 'body_rifle', src: 'img/sprites/body_rifle.json', type: 'spritesheet' },
 
+        { id: 'weapons', src: 'img/sprites/weapons.json', type: 'spritesheet' },
+        { id: 'ammo', src: 'img/sprites/ammo.json', type: 'spritesheet' },
+        
         { id: 'map_debug', src: 'img/maps/debug.png', type: 'image' },
     ];
 
@@ -169,6 +172,9 @@ game_client.prototype.begin = function( timestamp, delta ) {
 
     if ( this.keyboard.pressed( 'E' ) )
         this.inputs.push( 'n' );
+
+    if ( this.keyboard.pressed( 'space' ) )
+        this.inputs.push( 's' );
     
     // TODO: in the future check if the mouse position has changed since
     // last frame, if not, don't push it and if inputs is empty, don't send

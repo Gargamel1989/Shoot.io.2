@@ -3,7 +3,7 @@
     e.game_core = function() {
 
         this.environment = game_avatar.environment;
-
+        this.objects = game_avatar.objects;
         this.avatars = game_avatar.avatars;
 
         this.world_size = {
@@ -11,13 +11,17 @@
             height: 770,
         };
 
+        // Base chance of a weapon spawn per second. This is modified by the
+        // currrent amount of weapons on the map
+        this.weapon_spawn_chance = 0.1;
+
         // Create world boundaries
         this.environment.push(
             { x: -1, y: -1, w: 1, h: this.world_size.height },
             { x: this.world_size.width, y: -1, w: 1, h: this.world_size.height },
             { x: -1, y: -1, w: this.world_size.width, h: 1 },
             { x: -1, y: this.world_size.height, w: this.world_size.width, h: 1 }
-        )
+        );
 
     };
 
@@ -89,6 +93,8 @@
             forward: 0,
             right: 0,
 
+            space: false,
+
             mouse_x: 0,
             mouse_y: 0,
 
@@ -131,6 +137,10 @@
                     input_vector.scroll += 1;
                     break;
 
+                case 's':
+                    input_vector.space = true;
+                    break;
+
                 case 'm':
 
                     if ( parts[1] == 'l' ) {
@@ -165,6 +175,20 @@
     };
 
     e.game_core.prototype.update_world_from_snapshot = function( world_snapshot ) {
+
+        for ( var object_id in world_snapshot.objects ) {
+
+            if ( !this.objects[object_id] )
+                this.objects[world_snapshot.objects[object_id].id] = game_object.create_from_snapshot( world_snapshot.objects[object_id] );
+
+        }
+
+        for ( var object_id in this.objects ) {
+
+            if ( !world_snapshot.objects[object_id] )
+                delete this.objects[object_id];
+
+        }
         
         for ( var player_id in world_snapshot.players ) {
 
@@ -223,6 +247,13 @@
 
     e.game_core.prototype.update = function( dt ) {
 
+        for ( var object_id in this.objects ) {
+
+            if ( this.objects[object_id].has_disappeared() )
+                delete this.objects[object_id];
+
+        }
+
         for ( var player_id in this.avatars ) {
 
             var avatar = this.avatars[player_id];
@@ -262,9 +293,13 @@
     e.game_core.prototype.world_snapshot = function() {
        
         var snapshot = {
+            objects: {},
             players: {},
             particles: {}
         };
+
+        for ( var object_id in this.objects )
+            snapshot.objects[object_id] = this.objects[object_id].snapshot();
 
         for ( var player_id in this.avatars )
             snapshot.players[player_id] = this.avatars[player_id].snapshot();
