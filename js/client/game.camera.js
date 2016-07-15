@@ -45,7 +45,7 @@ var game_camera = function( game_core, debug ) {
     } 
 
     this.viewport = new createjs.Shape();
-    this.map.mask = this.viewport;
+    this.stage.mask = this.viewport;
 
     this.resize_viewport();
 

@@ -4,16 +4,21 @@ var game_animator = function( camera, avatar, debug ) {
 	this.stage = this.camera.stage;
 	
 	this.avatar = avatar;
+    this.last_equiped_weapon_name = null;
 
 	this.debug = debug || true;
 
-    this.feet_sprite = new createjs.Sprite( assets.getResult( 'feet' ), 'idle' );
-    this.feet_sprite.scaleX = 0.3;
-    this.feet_sprite.scaleY = 0.3;
+    setup_weapon_sprites();
 
-    this.body_sprite = new createjs.Sprite( assets.getResult( 'body_knife' ), 'idle' );
-    this.body_sprite.scaleX = 0.3;
-    this.body_sprite.scaleY = 0.3;
+    this.sprite_scale = 0.3;
+
+    this.feet_sprite = new createjs.Sprite( assets.getResult( 'feet' ), 'backstep' );
+    this.feet_sprite.scaleX = this.sprite_scale;
+    this.feet_sprite.scaleY = this.sprite_scale;
+
+    this.body_sprite = weapon_sprites.knife_sprite;
+    this.body_sprite.scaleX = this.sprite_scale;
+    this.body_sprite.scaleY = this.sprite_scale;
 
     this.health_bar_width = 50;
     this.health_bar_height = 5;
@@ -42,6 +47,21 @@ var game_animator = function( camera, avatar, debug ) {
 
 };
 
+var weapon_sprites = null;
+var setup_weapon_sprites = function() {
+
+    if ( weapon_sprites !== null )
+        return;
+
+    weapon_sprites = {
+        knife_sprite: new createjs.Sprite( assets.getResult( 'body_knife' ), 'idle' ),
+        handgun_sprite: new createjs.Sprite( assets.getResult( 'body_handgun' ), 'idle' ),
+        shotgun_sprite: new createjs.Sprite( assets.getResult( 'body_shotgun' ), 'idle' ),
+        rifle_sprite: new createjs.Sprite( assets.getResult( 'body_rifle' ), 'idle' ),
+    };
+
+};
+
 game_animator.prototype.destroy = function() {
 
     this.stage.removeChild( this.feet_sprite );
@@ -62,6 +82,37 @@ game_animator.prototype.update = function( dt ) {
 	if ( !this.visible )
 		return
 
+    if ( this.last_equiped_weapon_name != this.avatar.equiped_weapon.name ) {
+
+        this.stage.removeChild( this.body_sprite );
+
+        switch ( this.avatar.equiped_weapon.name ) {
+
+            case 'Knife':
+                this.body_sprite = weapon_sprites.knife_sprite;
+                break;
+
+            case 'Handgun':
+                this.body_sprite = weapon_sprites.handgun_sprite;
+                break;
+
+            case 'Shotgun':
+                this.body_sprite = weapon_sprites.shotgun_sprite;
+                break;
+
+            case 'Rifle':
+                this.body_sprite = weapon_sprites.rifle_sprite;
+                break;
+
+        }
+
+        this.body_sprite.scaleX = this.sprite_scale;
+        this.body_sprite.scaleY = this.sprite_scale;
+
+        this.stage.addChild( this.body_sprite );
+
+    }
+
     var camera_position = this.camera.world_to_camera_coordinates( this.avatar.position.x, this.avatar.position.y );
 
     this.feet_sprite.x = camera_position.x;
@@ -70,6 +121,7 @@ game_animator.prototype.update = function( dt ) {
 
     this.body_sprite.x = camera_position.x;
     this.body_sprite.y = camera_position.y;
+    this.body_sprite.rotation = this.feet_sprite.rotation;
 
     this.health_bar_wrapper.x = camera_position.x - ( this.health_bar_width / 2 ) - this.health_bar_margin; 
     this.health_bar_wrapper.y = camera_position.y + this.health_bar_offset;
