@@ -44,6 +44,8 @@ var game_camera = function( game_core, debug ) {
 
     } 
 
+    this.ui = new game_ui( this.core, this.stage, this.viewport, this.debug );
+
     this.viewport = new createjs.Shape();
     this.stage.mask = this.viewport;
 
@@ -73,8 +75,11 @@ game_camera.prototype.resize_viewport = function() {
         height: this.viewport_scale.height * viewport_bestfit_scale,
     };
     
-    this.viewport.graphics.clear().f( 'red' ).dr( ( window_w / 2 ) - ( this.viewport_size.width / 2 ), ( window_h / 2 ) - ( this.viewport_size.height / 2 ), this.viewport_size.width, this.viewport_size.height );
+    this.viewport.graphics.clear().f( 'red' ).dr( 0, 0, this.viewport_size.width, this.viewport_size.height );
+    this.viewport.x = ( window_w / 2 ) - ( this.viewport_size.width / 2 );
+    this.viewport.y = ( window_h / 2 ) - ( this.viewport_size.height / 2 );
 
+    this.ui.set_viewport( this.viewport.x, this.viewport.y, this.viewport_size.width, this.viewport_size.height );
 };
 
 game_camera.prototype.camera_to_world_coordinates = function( cam_x, cam_y ) {
@@ -98,6 +103,8 @@ game_camera.prototype.world_to_camera_coordinates = function( world_x, world_y )
 game_camera.prototype.follow = function( object_to_follow ) {
 
     this.object_to_follow = object_to_follow;
+
+    this.ui.set_player_avatar( object_to_follow );
 
     if ( this.debug ) {
 
@@ -197,6 +204,8 @@ game_camera.prototype.update = function( dt ) {
         }
 
     }
+
+    this.ui.update( dt );
 
     if ( this.debug ) {
 

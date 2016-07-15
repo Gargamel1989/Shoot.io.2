@@ -8,7 +8,12 @@ var game_animator = function( camera, avatar, debug ) {
 
 	this.debug = debug || true;
 
-    setup_weapon_sprites();
+    this.weapon_sprites = {
+        knife_sprite: new createjs.Sprite( assets.getResult( 'body_knife' ), 'idle' ),
+        handgun_sprite: new createjs.Sprite( assets.getResult( 'body_handgun' ), 'idle' ),
+        shotgun_sprite: new createjs.Sprite( assets.getResult( 'body_shotgun' ), 'idle' ),
+        rifle_sprite: new createjs.Sprite( assets.getResult( 'body_rifle' ), 'idle' ),
+    };
 
     this.sprite_scale = 0.3;
 
@@ -16,7 +21,7 @@ var game_animator = function( camera, avatar, debug ) {
     this.feet_sprite.scaleX = this.sprite_scale;
     this.feet_sprite.scaleY = this.sprite_scale;
 
-    this.body_sprite = weapon_sprites.knife_sprite;
+    this.body_sprite = this.weapon_sprites.knife_sprite;
     this.body_sprite.scaleX = this.sprite_scale;
     this.body_sprite.scaleY = this.sprite_scale;
 
@@ -47,21 +52,6 @@ var game_animator = function( camera, avatar, debug ) {
 
 };
 
-var weapon_sprites = null;
-var setup_weapon_sprites = function() {
-
-    if ( weapon_sprites !== null )
-        return;
-
-    weapon_sprites = {
-        knife_sprite: new createjs.Sprite( assets.getResult( 'body_knife' ), 'idle' ),
-        handgun_sprite: new createjs.Sprite( assets.getResult( 'body_handgun' ), 'idle' ),
-        shotgun_sprite: new createjs.Sprite( assets.getResult( 'body_shotgun' ), 'idle' ),
-        rifle_sprite: new createjs.Sprite( assets.getResult( 'body_rifle' ), 'idle' ),
-    };
-
-};
-
 game_animator.prototype.destroy = function() {
 
     this.stage.removeChild( this.feet_sprite );
@@ -89,19 +79,19 @@ game_animator.prototype.update = function( dt ) {
         switch ( this.avatar.equiped_weapon.name ) {
 
             case 'Knife':
-                this.body_sprite = weapon_sprites.knife_sprite;
+                this.body_sprite = this.weapon_sprites.knife_sprite;
                 break;
 
             case 'Handgun':
-                this.body_sprite = weapon_sprites.handgun_sprite;
+                this.body_sprite = this.weapon_sprites.handgun_sprite;
                 break;
 
             case 'Shotgun':
-                this.body_sprite = weapon_sprites.shotgun_sprite;
+                this.body_sprite = this.weapon_sprites.shotgun_sprite;
                 break;
 
             case 'Rifle':
-                this.body_sprite = weapon_sprites.rifle_sprite;
+                this.body_sprite = this.weapon_sprites.rifle_sprite;
                 break;
 
         }
