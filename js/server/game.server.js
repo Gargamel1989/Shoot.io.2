@@ -10,6 +10,7 @@ UUID            = require( 'node-uuid' );
 
 var MainLoop    = require( 'mainloop.js' ),
 
+    debug       = true,
     verbose     = true;
 
 var game_server = module.exports = {
@@ -18,6 +19,12 @@ var game_server = module.exports = {
     players: {},
 
     inputs: {},
+
+    game_loop_dt_begin: 0,
+    game_loop_dt_update: 0,
+    game_loop_dt_draw: 0,
+
+    game_loop_updates_per_frame: 0,
 
 };
 
@@ -41,6 +48,11 @@ game_server.start = function() {
 
 game_server.begin = function( timestamp, delta ) {
 
+    game_server.game_loop_updates_per_frame = 0;
+
+    if ( debug )
+        var start = new Date().getTime();
+
     // Start time of the frame
     game_server.server_time = timestamp;
 
@@ -53,60 +65,49 @@ game_server.begin = function( timestamp, delta ) {
 
     }
 
+    if ( debug )
+        game_server.game_loop_dt_begin = new Date().getTime() - start;
+
 };
 
 game_server.update = function( delta ) {
 
-    // Check for weapon spawns
-    var spawn_chance = game_server.core.weapon_spawn_chance * delta / 1000;
-    spawn_chance *= ( Object.keys( game_server.players ).length * 2 - Object.keys( game_server.core.objects ).length ) / Math.max( 1, Object.keys( game_server.players ).length * 2 );
+    if ( debug )
+        var start = new Date().getTime();
 
-    if ( Math.random() <= spawn_chance ) {
-        
-        var w = Math.random(),
-            new_weapon;
-
-        if ( w < 0.35 )
-            new_weapon = new game_object.game_object( null, game_object.TYPES.handgun, { 
-                x: game_server.core.world_size.width * Math.random(),
-                y: game_server.core.world_size.height * Math.random(),
-            } );
-
-        else if ( w < 0.7 )
-            new_weapon = new game_object.game_object( null, game_object.TYPES.handgun_ammo, { 
-                x: game_server.core.world_size.width * Math.random(),
-                y: game_server.core.world_size.height * Math.random(),
-            } );
-
-        else if ( w < 0.85 )
-            new_weapon = new game_object.game_object( null, game_object.TYPES.shotgun, { 
-                x: game_server.core.world_size.width * Math.random(),
-                y: game_server.core.world_size.height * Math.random(),
-            } );
-
-        else if ( w < 1 )
-            new_weapon = new game_object.game_object( null, game_object.TYPES.shotgun_ammo, { 
-                x: game_server.core.world_size.width * Math.random(),
-                y: game_server.core.world_size.height * Math.random(),
-            } );
-
-        game_server.core.objects[new_weapon.id] = new_weapon;
-
-        game_server.log( new_weapon.type + ' spawn at x: ' + new_weapon.position.x + ' y: ' + new_weapon.position.y );
-    }
+    game_server.spawn_random_shit( delta );
 
     // Update the world
     game_server.core.update( delta );
+
+    if ( debug )
+        game_server.game_loop_dt_update = new Date().getTime() - start;
+
+    game_server.game_loop_updates_per_frame++;
 
 };
 
 game_server.draw = function() {
 
+    if ( debug )
+        var start = new Date().getTime();
+
     // Send world state to each connected client
     world_snapshot = game_server.core.world_snapshot();
 
+    if ( debug )
+        world_snapshot.game_loop_debug = {
+            dt_begin: game_server.game_loop_dt_begin,
+            dt_update: game_server.game_loop_dt_update,
+            dt_draw: game_server.game_loop_dt_draw,
+            updates_per_frame: game_server.game_loop_updates_per_frame,
+        };
+
     for ( var player_id in game_server.players )
         game_server.players[player_id].emit( 'serverupdate', world_snapshot );
+
+    if ( debug )
+        game_server.game_loop_dt_draw = new Date().getTime() - start;
 
 };
 
@@ -163,5 +164,74 @@ game_server.on_message = function( player, message ) {
             break;
 
     }
+
+};
+
+game_server.spawn_random_shit = function( dt ) {
+    
+    // Check if we spawn something this update
+    var spawn_chance = game_server.core.spawn_chance * dt / 1000;
+
+    if ( Math.random() > spawn_chance )
+        return;
+ 
+    var no_weapons = 0,
+        no_ammo = 0,
+        no_players = Object.keys( game_server.core.avatars ).length;
+
+    for ( object_id in game_server.core.objects ) {
+
+        var o = game_server.core.objects[object_id];
+
+        if ( o.type == game_object.TYPES.handgun || o.type == game_object.TYPES.shotgun )
+            no_weapons++;
+
+        else if ( o.type == game_object.TYPES.handgun_ammo || o.type == game_object.TYPES.shotgun_ammo )
+            no_ammo++;
+
+    }
+
+    var new_spawn,
+        w = Math.random();
+
+    // If there are less weapons on the field than there are players, we 
+    // get a 70% chance of spawning a weapon
+    if (  Math.random() < 0.7 && ( no_weapons < no_players || Math.random() < Math.exp( -2.3 / Math.max( 1, no_weapons - no_players ) ) ) ) {
+        
+        if ( w < 0.7 )
+            new_spawn = new game_object.game_object( null, game_object.TYPES.handgun, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+        else if ( w < 1 )
+            new_spawn = new game_object.game_object( null, game_object.TYPES.shotgun, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+    } else if ( no_ammo < no_players || Math.random() < 2 * Math.exp( -2.3 / Math.max( 1, no_weapons - no_players ) ) ) {
+
+        if ( w < 0.5 )
+            new_spawn = new game_object.game_object( null, game_object.TYPES.handgun_ammo, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+
+        else if ( w < 1 )
+            new_spawn = new game_object.game_object( null, game_object.TYPES.shotgun_ammo, { 
+                x: game_server.core.world_size.width * Math.random(),
+                y: game_server.core.world_size.height * Math.random(),
+            } );
+
+    }
+
+    if ( !new_spawn )
+        return;
+        
+    game_server.core.objects[new_spawn.id] = new_spawn;
+
+    game_server.log( new_spawn.type + ' spawn at x: ' + new_spawn.position.x + ' y: ' + new_spawn.position.y );
 
 };

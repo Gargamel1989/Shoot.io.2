@@ -42,6 +42,8 @@
         };
         this.state = this.STATES.idle;
 
+        this.run_speed_modifier = 1;
+
         this.time_since_attack_start = 0;
         this.attack_duration = 1000;
 
@@ -129,6 +131,8 @@
         };
         this.state = this.STATES.idle;
         this.action_timeout = 0;
+
+        this.run_speed_modifier = 0.9;
 
         this.max_loaded_ammo = 12;
         this.loaded_ammo = this.max_loaded_ammo;
@@ -269,6 +273,8 @@
         };
         this.state = this.STATES.idle;
         this.action_timeout = 0;
+
+        this.run_speed_modifier = 0.8;
 
         this.max_loaded_ammo = 2;
         this.loaded_ammo = this.max_loaded_ammo;

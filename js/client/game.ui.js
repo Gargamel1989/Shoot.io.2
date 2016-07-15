@@ -20,6 +20,21 @@ var game_ui = function( game_core, stage, viewport, debug ) {
     this.stage.addChild( this.weapon_name_text );
     this.stage.addChild( this.weapon_ammo_text );
 
+    this.game_loop_debug = null;
+
+    if ( this.debug ) {
+
+        this.debug_bar = new createjs.Shape();
+        this.debug_bar.alpha = 0.3;
+
+        this.server_debug_text = new createjs.Text( '', '16px Courier', '#FFF' );
+        this.client_debug_text = new createjs.Text( '', '16px Courier', '#FFF' );
+
+        this.stage.addChild( this.debug_bar );
+        this.stage.addChild( this.server_debug_text );
+        this.stage.addChild( this.client_debug_text );
+    }
+
 };
 
 game_ui.prototype.set_player_avatar = function( player_avatar ) {
@@ -38,6 +53,18 @@ game_ui.prototype.set_viewport = function( x, y, w, h ) {
 
     this.weapon_ammo_text.x = this.weapon_text_bg.x + 10;
     this.weapon_ammo_text.y = this.weapon_text_bg.y + 40;
+
+    if ( this.debug ) {
+
+        this.debug_bar.graphics.clear().f( '#000' ).dr( x, y, w, 40 );
+
+        this.server_debug_text.x = x + 14;
+        this.server_debug_text.y = y + 10;
+
+        this.client_debug_text.x = x + ( w / 2 ) + 14;
+        this.client_debug_text.y = y + 10;
+
+    }
 
 };
 
@@ -58,6 +85,16 @@ game_ui.prototype.update = function( dt ) {
             this.weapon_ammo_text.text = '';
 
         }
+
+    }
+
+    if ( this.debug ) {
+
+        if ( this.server_game_loop_debug )
+            this.server_debug_text.text = 'begin: ' + this.server_game_loop_debug.dt_begin + ' update: ' + this.server_game_loop_debug.dt_update + ' draw: ' + this.server_game_loop_debug.dt_draw + ' upf: ' + this.server_game_loop_debug.updates_per_frame;
+console.log(this.client_game_loop_debug)
+        if ( this.client_game_loop_debug )
+            this.client_debug_text.text = 'begin: ' + this.client_game_loop_debug.dt_begin + ' update: ' + this.client_game_loop_debug.dt_update + ' draw: ' + this.client_game_loop_debug.dt_draw + ' upf: ' + this.client_game_loop_debug.updates_per_frame;
 
     }
 

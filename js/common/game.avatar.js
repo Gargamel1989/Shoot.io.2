@@ -147,7 +147,7 @@
         }
         
         // Update position of the avatar
-        var movement_vector = f.v_mul_scalar( this.movement_speed_vector, g.pixels_per_m * dt / 1000.0 );
+        var movement_vector = f.v_mul_scalar( this.movement_speed_vector, this.equiped_weapon.run_speed_modifier * g.pixels_per_m * dt / 1000.0 );
         var movement_mag = f.v_mag( movement_vector );
         var movement_angle = f.v_angle( movement_vector );
 

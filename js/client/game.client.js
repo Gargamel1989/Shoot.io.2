@@ -30,6 +30,8 @@ window.onload = function() {
 
 var game_client = function() {
 
+    this.debug = true;
+
 	this.STATES = {
         connecting:     'connecting',
         connected:      'connected',
@@ -54,6 +56,15 @@ var game_client = function() {
 	this.input_seq = -1;
 
     this.latest_server_update = null;
+
+    if ( this.debug ) {
+
+        this.game_loop_dt_begin = 0;
+        this.game_loop_dt_update = 0;
+        this.game_loop_dt_draw = 0;
+        this.game_loop_updates_per_frame = 0;
+
+    };
 
 };
 
@@ -152,6 +163,11 @@ game_client.prototype.on_server_update = function( data ) {
 
 game_client.prototype.begin = function( timestamp, delta ) {
 
+    this.game_loop_updates_per_frame = 0;
+
+    if ( this.debug )
+        var start = new Date().getTime();
+
 	this.input_seq++;
 		
 	if ( this.keyboard.pressed( 'Q' ) || this.keyboard.pressed( 'left' ) )
@@ -192,19 +208,52 @@ game_client.prototype.begin = function( timestamp, delta ) {
 
 	this.inputs = [];
 
+    if ( this.debug )
+        this.game_loop_dt_begin = new Date().getTime() - start;
+
 };
 
 game_client.prototype.update = function( dt ) {
     
-    if ( this.latest_server_update )
+    if ( this.debug )
+        var start = new Date().getTime();
+
+    if ( this.latest_server_update ) {
+
         this.core.update_world_from_snapshot( this.latest_server_update );
 
+        if ( this.latest_server_update.game_loop_debug )
+            this.camera.ui.server_game_loop_debug = this.latest_server_update.game_loop_debug;
+
+    }
+
     this.camera.update();
+
+    if ( this.debug )
+        this.game_loop_dt_update = new Date().getTime() - start;
+
+    this.game_loop_updates_per_frame++;
 
 };
 
 game_client.prototype.draw = function() {
 
+    if ( this.debug )
+        var start = new Date().getTime();
+
     this.camera.draw();
+
+    if ( this.debug ) {
+
+        this.game_loop_dt_draw = new Date().getTime() - start;
+
+        this.camera.ui.client_game_loop_debug = {
+            dt_begin: this.game_loop_dt_begin,
+            dt_update: this.game_loop_dt_update,
+            dt_draw: this.game_loop_dt_draw,
+            updates_per_frame: this.game_loop_updates_per_frame,
+        };
+
+    }
 
 };

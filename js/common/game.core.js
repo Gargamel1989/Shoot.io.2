@@ -13,7 +13,7 @@
 
         // Base chance of a weapon spawn per second. This is modified by the
         // currrent amount of weapons on the map
-        this.weapon_spawn_chance = 0.1;
+        this.spawn_chance = 0.1;
 
         // Create world boundaries
         this.environment.push(
