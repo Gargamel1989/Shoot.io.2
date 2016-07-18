@@ -49,8 +49,13 @@
     e.slash.prototype.hit = function( target ) {
     
         // Only do damage on the first hit of a target    
-        if ( this.has_hit.indexOf( target ) < 0 )
+        if ( this.has_hit.indexOf( target ) < 0 ) {
+
             target.damage( this.damage );
+
+            this.has_hit.push( target );
+
+        }
 
     };
 
