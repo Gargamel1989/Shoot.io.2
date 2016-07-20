@@ -126,5 +126,46 @@ game_animator.prototype.update = function( dt ) {
         this.debug_position.y = this.feet_sprite.y;
             
     }
+
+    var wanted_animation;
+    if ( this.avatar.movement_speed_vector ) {
+
+        // Animate the sprite according to avatar movement
+        if ( this.avatar.movement_speed_vector.x < 0 )
+            wanted_animation = 'backstep';
+
+        else if ( this.avatar.movement_speed_vector.y > 0 && this.avatar.movement_speed_vector.x < this.avatar.movement_speed_vector.y )
+            wanted_animation = 'strafe_left';
+
+        else if ( this.avatar.movement_speed_vector.y < 0 && this.avatar.movement_speed_vector.x < -this.avatar.movement_speed_vector.y )
+            wanted_animation = 'strafe_right';
+
+        else if ( f.v_mag( this.avatar.movement_speed_vector ) > 0.001 )
+            wanted_animation = 'run';
+
+        else
+            wanted_animation = 'idle';
+
+    } else
+        wanted_animation = 'idle';
     
+    if ( this.feet_sprite.currentAnimation != wanted_animation )
+        this.feet_sprite.gotoAndPlay( wanted_animation );
+    
+    if ( this.avatar.equiped_weapon.name == 'Knife' ) {
+
+        if ( this.avatar.equiped_weapon.state == this.avatar.equiped_weapon.STATES.attacking )
+            wanted_animation = 'attack';
+
+        else if ( f.v_mag( this.avatar.movement_speed_vector ) > 0.001 )
+            wanted_animation = 'run';
+
+        else
+            wanted_animation = 'idle';
+
+    }
+
+    if ( this.body_sprite.currentAnimation != wanted_animation )
+        this.body_sprite.gotoAndPlay( wanted_animation );
+
 };

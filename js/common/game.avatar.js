@@ -284,6 +284,7 @@
         
         this.position = snapshot.p;
         this.direction = snapshot.d;
+        this.movement_speed_vector = snapshot.m;
         this.health = snapshot.h;
         if ( this.equiped_weapon.name == snapshot.w.name )
             this.equiped_weapon.update_from_snapshot( snapshot.w );
@@ -293,10 +294,11 @@
     };
 
     e.game_avatar.prototype.snapshot = function() {
-        
+       
         return {
             p: this.position,
             d: this.direction,
+            m: this.movement_speed_vector,
             h: this.health,
             w: this.equiped_weapon.snapshot(),
         };

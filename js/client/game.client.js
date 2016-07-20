@@ -22,6 +22,14 @@ window.onload = function() {
    
 	    c.connect();
 
+        document.getElementById( 'loader-wrapper' ).style.display = 'none';
+
+    } );
+
+    assets.addEventListener( 'progress', function( ev ) {
+
+        document.getElementById( 'progress' ).innerHTML = ( 100 * ev.progress ).toFixed(0) + '%';
+
     } );
 
     assets.loadManifest( assets_manifest );

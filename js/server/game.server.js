@@ -167,6 +167,28 @@ game_server.on_message = function( player, message ) {
 
 };
 
+/**
+ * Item Spawn Rate:
+ *
+ * p: Number of players online
+ * P(i, p): Chance per second of an item spawning, function of the number
+ *          of items on the floor and players online
+ * n_i: A per-item parameter that determines the maximum amount of items
+ *      on the floor of that kind at any given time by the formula:
+ *      max(I) = n_i * #players
+ * i: Number of items on the floor of this type
+ *
+ * P(0, p) = 1
+ * Exponential decline
+ * P(n_i * p, p) = 0
+ *
+ */
+var spawn_chance_per_second = function( n_i, p, i ) {
+
+    return ( 1 / ( Math.exp( n_i * p ) - 1 ) ) * ( Math.exp( ( n_i * p ) - i ) - 1 );
+
+};
+
 game_server.spawn_random_shit = function( dt ) {
     
     // Check if we spawn something this update

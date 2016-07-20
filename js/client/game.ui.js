@@ -92,7 +92,7 @@ game_ui.prototype.update = function( dt ) {
 
         if ( this.server_game_loop_debug )
             this.server_debug_text.text = 'begin: ' + this.server_game_loop_debug.dt_begin + ' update: ' + this.server_game_loop_debug.dt_update + ' draw: ' + this.server_game_loop_debug.dt_draw + ' upf: ' + this.server_game_loop_debug.updates_per_frame;
-console.log(this.client_game_loop_debug)
+
         if ( this.client_game_loop_debug )
             this.client_debug_text.text = 'begin: ' + this.client_game_loop_debug.dt_begin + ' update: ' + this.client_game_loop_debug.dt_update + ' draw: ' + this.client_game_loop_debug.dt_draw + ' upf: ' + this.client_game_loop_debug.updates_per_frame;
 
