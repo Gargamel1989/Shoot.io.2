@@ -53,6 +53,32 @@
 
     };
 
+    e.game_avatar.prototype.is_colliding_avatar = function() {
+
+        for ( player_id in e.avatars ) {
+
+            if ( e.avatars[player_id] !== this && f.collision_test_circles( this.hitbox, e.avatars[player_id].hitbox ) )
+                return e.avatars[player_id];   
+
+        };
+        
+        return false;
+
+    };
+
+    e.game_avatar.prototype.is_colliding_environment = function() {
+
+        for ( env_i in e.environment ) {
+
+            if ( f.collision_test_circle_rect( this.hitbox, e.environment[env_i] ) )
+                return e.environment[env_i];
+
+        }
+
+        return false;
+        
+    };
+
     e.game_avatar.prototype.reset = function() {
         
         this.health = this.max_health;
@@ -151,9 +177,10 @@
         var movement_mag = f.v_mag( movement_vector );
         var movement_angle = f.v_angle( movement_vector );
 
+        var absolute_angle = this.direction + movement_angle;
         var absolute_movement = {
-            x: movement_mag * Math.cos( this.direction + movement_angle ),
-            y: movement_mag * Math.sin( this.direction + movement_angle ),
+            x: movement_mag * Math.cos( absolute_angle ),
+            y: movement_mag * Math.sin( absolute_angle ),
         };
 
         var new_position = f.v_add( this.position, absolute_movement );
@@ -161,40 +188,74 @@
         
         this.set_position( new_position.x, new_position.y );
 
-        // Check for collisions
-        var collided = false;
-        
-        for ( player_id in e.avatars ) {
+        var collider;
+        if ( collider = this.is_colliding_avatar() ) {
+            
+            this.set_position( old_position.x, old_position.y );
 
-            if ( e.avatars[player_id] !== this && f.collision_test_circles( this.hitbox, e.avatars[player_id].hitbox ) ) {
-                
-                // Collision
+            // Try to walk past the collider in the direction of the mouse
+            
+            // The vector between the two centers of the colliding circles
+            var center_line_angle = f.v_angle( f.v_sub( collider.hitbox, this.hitbox ) );
+            var perp_line_pos = f.v_cart( movement_mag, center_line_angle + ( Math.PI / 2 ) ),
+                perp_line_neg = f.v_cart( movement_mag, center_line_angle - ( Math.PI / 2 ) );
+
+            var d_angle_pos = f.v_angle_between( absolute_movement, perp_line_pos ),
+                d_angle_neg = f.v_angle_between( absolute_movement, perp_line_neg );
+
+            if ( d_angle_pos < d_angle_neg )
+                absolute_movement = perp_line_pos;
+            else
+                absolute_movement = perp_line_neg;
+           
+            var new_position = f.v_add( this.position, absolute_movement );
+       
+            this.set_position( new_position.x, new_position.y );
+
+            if ( this.is_colliding_avatar() || this.is_colliding_environment() )
                 this.set_position( old_position.x, old_position.y );
 
-                collided = true;
+        } else if ( collider = this.is_colliding_environment() ) {
+
+            this.set_position( old_position.x, old_position.y );
+
+            // Try to walk along the edge of the environment block
+
+            var norm_dir = f.mod( this.direction, 2 * Math.PI );
+
+            var floor_dir,
+                ceil_dir;
+
+            if ( norm_dir <= Math.PI / 2 ) {
+                floor_dir = 0;
+                ceil_dir = Math.PI / 2;
+            } else if ( norm_dir <= Math.PI ) {
+                floor_dir = Math.PI / 2;
+                ceil_dir = Math.PI;
+            } else if ( norm_dir <= 3 * Math.PI / 2 ) {
+                floor_dir = Math.PI;
+                ceil_dir = 3 * Math.PI / 2;
+            } else {
+                floor_dir = 3 * Math.PI / 2;
+                ceil_dir = 0;
+            }
+
+            var new_position = f.v_add( this.position, f.v_cart( movement_mag, floor_dir ) );
+            this.set_position( new_position.x, new_position.y );
+
+            if ( f.collision_test_circle_rect( this.hitbox, collider ) ) {
+                
+                this.set_position( old_position.x, old_position.y );
+                new_position = f.v_add( this.position, f.v_cart( movement_mag, ceil_dir ) );
+                this.set_position( new_position.x, new_position.y );
 
             }
 
-        };
-
-        if ( !collided ) {
-
-            for ( env_i in e.environment ) {
-
-                var env_obj = e.environment[env_i];
-
-                if ( f.collision_test_circle_rect( this.hitbox, env_obj ) ) {
-
-                    this.set_position( old_position.x, old_position.y );
-
-                    collided = true;
-
-                }
-
-            }
-
+            if ( this.is_colliding_avatar() || this.is_colliding_environment() )
+                this.set_position( old_position.x, old_position.y );
+            
         }
-        
+
         // Update equipment of the avatar
         if ( this.equiped_weapon !== null ) {
 

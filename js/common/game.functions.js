@@ -15,8 +15,20 @@
         return Math.atan2( v.y, v.x );
     };
 
+    e.v_angle_between = function( v1, v2 ) {
+        return Math.acos( e.v_dot( v1, v2 ) / ( e.v_mag( v1 ) * e.v_mag( v2 ) ) );
+    };
+
+    e.v_cart = function( magnitude, angle ) {
+        return { x: magnitude * Math.cos( angle ), y: magnitude * Math.sin( angle ) };
+    };
+
+    e.v_dot = function( v1, v2 ) {
+        return ( v1.x * v2.x ) + ( v1.y * v2.y );
+    };
+
     e.v_mag = function( v ) {
-        return Math.sqrt( v.x * v.x + v.y * v.y );
+        return Math.sqrt( e.v_dot( v, v ) );
     };
 
     e.v_mul_scalar = function( v, scalar ) {
