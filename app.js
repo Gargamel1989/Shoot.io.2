@@ -165,10 +165,10 @@ global.__base = __dirname + '/';
     game_server.start();
 
     sio.sockets.on('connection', function (player) {
-    
+
         //now we can find them a game to play with someone.
         //if no game exists with someone waiting, they create one and wait.
-        game_server.join( player );
+        game_server.join( player, player.request._query.nickname, player.request._query.color );
 
         //Useful to know when someone connects
         if (verbose) console.log('\t :: socket.io\t:: player ' + player.userid + ' connected');

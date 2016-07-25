@@ -25,9 +25,9 @@
 
     };
 
-    e.game_core.prototype.add_avatar = function( player_id ) {
+    e.game_core.prototype.add_avatar = function( player_id, player_nickname, player_color ) {
 
-        var avatar = new game_avatar.game_avatar();
+        var avatar = new game_avatar.game_avatar( player_nickname, player_color );
         this.avatars[player_id] = avatar;
 
         this.move_to_random_position( avatar );

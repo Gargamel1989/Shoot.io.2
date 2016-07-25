@@ -20,9 +20,19 @@ window.onload = function() {
 
 	    var c = new game_client();
    
-	    c.connect();
+        document.getElementById( 'loader' ).style.display = 'none';
+        document.getElementById( 'progress' ).style.display = 'none';
+        document.getElementById( 'start-button-container' ).style.display = 'block';
+        document.getElementById( 'start-button-container' ).onclick = function( ev ) {
 
-        document.getElementById( 'loader-wrapper' ).style.display = 'none';
+            var nickname = document.getElementById( 'nickname' ).value;
+            var color = document.getElementById( 'color' ).value;
+
+            c.connect( nickname, color );
+
+            document.getElementById( 'intro-wrapper' ).style.display = 'none';
+
+        };
 
     } );
 
@@ -76,11 +86,13 @@ var game_client = function() {
 
 };
 
-game_client.prototype.connect = function() {
+game_client.prototype.connect = function( nickname, color ) {
 	
 	this.state = this.STATES.connecting;
 	
-	this.socket = io.connect();
+	this.socket = io.connect( {
+        query: 'nickname=' + nickname + '&color=' + color,
+    } );
 	
 	// On error we just show that we are not connected for now.
     this.socket.on( 'error', this.on_disconnect.bind( this ) );
@@ -106,7 +118,7 @@ game_client.prototype.on_connected = function( player ) {
 	this.player_id = player.id;
 
     this.core = new game_core.game_core();
-    var player_avatar = this.core.add_avatar( this.player_id );
+    var player_avatar = this.core.add_avatar( this.player_id, player.nickname, player.color );
 
     this.camera = new game_camera( this.core );
     this.camera.follow( player_avatar );

@@ -113,18 +113,45 @@ game_server.draw = function() {
 
 
 
-game_server.join = function( player ) {
-    
+game_server.join = function( player, nickname, color ) {
+
     player.game_id = UUID();
 
+    nickname = game_server.sanitize_input( nickname );
+    color = game_server.sanitize_input( color );
+
+    if ( nickname == '' )
+        nickname = random_nicknames[Math.floor( Math.random() * random_nicknames.length )];
+
+    var extra = 0,
+        unduplicated_nickname = nickname;
+    while ( game_server.nickname_exists( unduplicated_nickname ) ) {
+
+        extra++;
+        unduplicated_nickname = nickname + '#' + extra;
+
+    }
+
+    if ( color == '' )
+        color = '#000000'.replace( /0/g, function() {
+            return ( ~~( Math.random() * 16 ) ).toString( 16 );
+        } );
+
+    player.nickname = unduplicated_nickname;
+    player.color = color;
+   
     game_server.log( 'Player ' + player.game_id + ' joined the server.' );
 
     game_server.players[player.game_id] = player;
 
-    game_server.core.add_avatar( player.game_id );
+    game_server.core.add_avatar( player.game_id, player.nickname, player.color );
 
     // Tell the player they connected, giving them their id
-    player.emit( 'connected', { id: player.game_id } );
+    player.emit( 'connected', { 
+        id: player.game_id,
+        nickname: player.nickname,
+        color: player.color,
+    } );
 
 };
 
@@ -135,6 +162,19 @@ game_server.leave = function( player ) {
     delete game_server.players[player.game_id];
 
     game_server.core.remove_avatar( player.game_id );
+
+};
+
+game_server.nickname_exists = function( nickname ) {
+
+    for ( player_id in game_server.players ) {
+
+        if ( game_server.players[player_id].nickname == nickname )
+            return true;
+
+    }
+
+    return false;
 
 };
 
@@ -164,6 +204,27 @@ game_server.on_message = function( player, message ) {
             break;
 
     }
+
+};
+
+game_server.sanitize_input = function( input_string, max_length ) {
+
+    var allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_ ';
+    max_length = max_length || 15;
+
+    sanitized_string = '';
+
+    for ( var i = 0, len = input_string.length; i < len; i++ ) {
+
+        if ( allowed_chars.indexOf( input_string.charAt( i ) ) > -1 )
+            sanitized_string += input_string.charAt( i );
+
+        if ( sanitized_string.length >= max_length )
+            break;
+
+    }
+
+    return sanitized_string;
 
 };
 
@@ -257,3 +318,13 @@ game_server.spawn_random_shit = function( dt ) {
     game_server.log( new_spawn.type + ' spawn at x: ' + new_spawn.position.x + ' y: ' + new_spawn.position.y );
 
 };
+
+var random_nicknames = [
+    'ahole', 'anus', 'asshole', 'ass-monkey', 'assface', 'asswipe', 'bastard',
+    'bitch', 'lil-bitch', 'butthole', 'buttwipe', 'cock', 'cockhead', 
+    'cocksucker', 'cunt', 'dick', 'dickbut', 'dildo', 'enema', 'fart',
+    'fucker', 'jackoff', 'jizzer', 'knob', 'dipshot', 'masturbator', 
+    'peenus', 'peenor', 'penis', 'pussy', 'rectum', 'semen', 'shit',
+    'skank', 'shitter', 'lil-shit', 'slag', 'slut', 'turd', 'vagina',
+    'arschloch', 'nutsack', 'wanker',
+];

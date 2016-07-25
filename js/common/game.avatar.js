@@ -12,7 +12,10 @@
      * A simple class to maintain state of a players avatar in the game
      *
      */
-    e.game_avatar = function( ) {
+    e.game_avatar = function( nickname, color ) {
+
+        this.nickname = nickname;
+        this.color = color;
 
         // Attributes
         this.base_speed = 2.8; // m/s
@@ -282,6 +285,9 @@
 
     e.game_avatar.prototype.update_from_snapshot = function( snapshot ) {
         
+        this.nickname = snapshot.n;
+        this.color = snapshot.c;
+
         this.position = snapshot.p;
         this.direction = snapshot.d;
         this.movement_speed_vector = snapshot.m;
@@ -296,6 +302,9 @@
     e.game_avatar.prototype.snapshot = function() {
        
         return {
+            n: this.nickname,
+            c: this.color,
+
             p: this.position,
             d: this.direction,
             m: this.movement_speed_vector,

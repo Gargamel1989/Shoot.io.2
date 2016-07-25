@@ -41,15 +41,11 @@ html, body {
     text-align:center;
     top: 50%;
     width: 100%;
-    margin-top: -130px;
+    margin-top: -150px;
 }
 
 #options input {
-    height: 25px;
-    border: none;
-    border-radius: 10px;
-    margin: 5px;
-    padding: 0 10px;
+    height: 30px;
 }
 
 #loader {
@@ -137,37 +133,3 @@ html, body {
     color: #ddd;
 }
 
-#start-button-container {
-    display: none;
-    position: absolute;
-    top: 50%;
-    width: 100%;
-    text-align: center;
-}
-
-#start-button-container #start-button {
-    padding: 8px 12px;
-    background-color: #e7e7e7;
-    border-color: #cccccc;
-    color: #333333;
-	-moz-user-select: none;
-    background-image: none;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 15px;
-    font-weight: normal;
-    line-height: 1.4;
-    margin-bottom: 0;
-    padding: 8px 12px;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap;
-}
-
-#start-button-container #start-button:hover {
-	background-color: #cecece;
-    border-color: #adadad;
-    color: #333333;
-}

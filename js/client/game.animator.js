@@ -35,6 +35,11 @@ var game_animator = function( camera, avatar, debug ) {
 
     this.health_bar = new createjs.Shape();
     this.health_bar.graphics.clear().f( 'red' ).dr( 0, 0, this.health_bar_width, this.health_bar_height );
+    
+    this.nickname_offset = -60;
+
+    this.nickname = new createjs.Text( this.avatar.nickname, 'bold 18px Arial', '#000' );
+    this.nickname.textAlign = 'center';
 
     if ( this.debug ) {
 
@@ -49,6 +54,7 @@ var game_animator = function( camera, avatar, debug ) {
     this.stage.addChild( this.body_sprite );
     this.stage.addChild( this.health_bar_wrapper );
     this.stage.addChild( this.health_bar );
+    this.stage.addChild( this.nickname );
 
 };
 
@@ -58,6 +64,7 @@ game_animator.prototype.destroy = function() {
     this.stage.removeChild( this.body_sprite );
     this.stage.removeChild( this.health_bar_wrapper );
     this.stage.removeChild( this.health_bar );
+    this.stage.removeChild( this.nickname );
 
     if ( this.debug ) {
 
@@ -120,6 +127,9 @@ game_animator.prototype.update = function( dt ) {
     this.health_bar.y = camera_position.y + this.health_bar_offset + this.health_bar_margin;
     this.health_bar.scaleX = this.avatar.health / this.avatar.max_health;
 
+    this.nickname.x = camera_position.x;
+    this.nickname.y = camera_position.y + this.nickname_offset;
+
     if ( this.debug ) {
 
         this.debug_position.x = this.feet_sprite.x;
@@ -152,18 +162,23 @@ game_animator.prototype.update = function( dt ) {
     if ( this.feet_sprite.currentAnimation != wanted_animation )
         this.feet_sprite.gotoAndPlay( wanted_animation );
     
-    if ( this.avatar.equiped_weapon.name == 'Knife' ) {
+    if ( this.avatar.movement_speed_vector ) {
+        
+        if ( this.avatar.equiped_weapon.name == 'Knife' ) {
 
-        if ( this.avatar.equiped_weapon.state == this.avatar.equiped_weapon.STATES.attacking )
-            wanted_animation = 'attack';
+            if ( this.avatar.equiped_weapon.state == this.avatar.equiped_weapon.STATES.attacking )
+                wanted_animation = 'attack';
 
-        else if ( f.v_mag( this.avatar.movement_speed_vector ) > 0.001 )
-            wanted_animation = 'run';
+            else if ( f.v_mag( this.avatar.movement_speed_vector ) > 0.001 )
+                wanted_animation = 'run';
 
-        else
-            wanted_animation = 'idle';
+            else
+                wanted_animation = 'idle';
 
-    }
+        }
+
+    } else
+        wanted_animation = 'idle';
 
     if ( this.body_sprite.currentAnimation != wanted_animation )
         this.body_sprite.gotoAndPlay( wanted_animation );
