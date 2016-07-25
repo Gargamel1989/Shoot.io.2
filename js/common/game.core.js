@@ -267,6 +267,13 @@
 
             }
 
+            for ( var object_id in this.objects ) {
+
+                if ( f.collision_test_circles( avatar.hitbox, this.objects[object_id].hitbox ) )
+                    this.objects[object_id].pick_up( avatar );
+
+            }
+
         }
 
         for ( var particle_id in game_particle.world_particles ) {

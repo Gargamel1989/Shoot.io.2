@@ -127,20 +127,6 @@
 
         }
 
-        if ( this.input_vector.space ) {
-
-            for ( object_id in e.objects ) {
-
-                if ( f.collision_test_circles( this.hitbox, e.objects[object_id].hitbox ) ) {
-
-                    e.objects[object_id].pick_up( this );
-
-                }
-
-            }
-
-        }
-    
     };
 
     e.game_avatar.prototype.set_position = function( x, y ) {

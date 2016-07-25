@@ -6,6 +6,17 @@
 
         shotgun: 'Shotgun',
         shotgun_ammo: 'Shotgun Ammo',
+
+        health: 'First Aid Kit',
+        armor: 'Bulletproof Vest',
+        money: 'Money',
+
+    };
+
+    e.create_from_snapshot = function( snapshot ) {
+
+        return new e.game_object( snapshot.id, snapshot.t, snapshot.p );
+
     };
 
     e.game_object = function( id, type, position ) {
@@ -13,15 +24,9 @@
         this.id = id || UUID();
         this.type = type;
         this.position = position;
-        this.hitbox = { x: position.x, y: position.y, r: 20 };
+        this.hitbox = { x: position.x, y: position.y, r: 5 };
 
         this.picked_up = false;
-
-    };
-
-    e.create_from_snapshot = function( snapshot ) {
-
-        return new e.game_object( snapshot.id, snapshot.t, snapshot.p );
 
     };
 
@@ -101,7 +106,13 @@
 
             shotgun.extra_ammo += 4;
 
-        }
+        } else if ( this.type == e.TYPES.health ) {
+
+        } else if ( this.type == e.TYPES.armor ) {
+
+        } else if ( this.type == e.TYPES.money ) {
+
+        };
 
         this.picked_up = true;
 
