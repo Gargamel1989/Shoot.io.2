@@ -118,7 +118,7 @@ game_server.join = function( player, nickname, color ) {
     player.game_id = UUID();
 
     nickname = game_server.sanitize_input( nickname );
-    color = game_server.sanitize_input( color );
+    color = game_server.sanitize_input( color, 6 );
 
     if ( nickname == '' )
         nickname = random_nicknames[Math.floor( Math.random() * random_nicknames.length )];
@@ -132,10 +132,13 @@ game_server.join = function( player, nickname, color ) {
 
     }
 
-    if ( color == '' )
+    if ( color == '' || !color.match( /^([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/ ) )
         color = '#000000'.replace( /0/g, function() {
             return ( ~~( Math.random() * 16 ) ).toString( 16 );
         } );
+
+    else
+        color = '#' + color;
 
     player.nickname = unduplicated_nickname;
     player.color = color;
@@ -249,6 +252,8 @@ var spawn_chance_per_second = function( n_i, p, i ) {
     return ( 1 / ( Math.exp( n_i * p ) - 1 ) ) * ( Math.exp( ( n_i * p ) - i ) - 1 );
 
 };
+
+game_server.spawn_info = {};
 
 game_server.spawn_random_shit = function( dt ) {
     

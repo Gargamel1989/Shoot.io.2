@@ -51,7 +51,7 @@
         // Only do damage on the first hit of a target    
         if ( this.has_hit.indexOf( target ) < 0 ) {
 
-            target.damage( this.damage );
+            target.damage( this.owner, this.damage );
 
             this.has_hit.push( target );
 
@@ -155,7 +155,7 @@
 
     e.bullet.prototype.hit = function( target ) {
 
-        target.damage( this.damage );
+        target.damage( this.owner, this.damage );
         this.has_hit = true;
 
     };
@@ -264,7 +264,7 @@
     
     e.shrapnel.prototype.hit = function( target ) {
 
-        target.damage( this.damage );
+        target.damage( this.owner, this.damage );
         this.has_hit = true;
 
     };

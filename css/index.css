@@ -52,6 +52,11 @@ html, body {
     padding: 0 10px;
 }
 
+#options .hex-char {
+    margin: 0 -2px 0 5px;
+    font-size: 20px;
+}
+
 #loader {
     display: block;
     position: absolute;

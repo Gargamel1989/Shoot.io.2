@@ -22,9 +22,12 @@
 
         this.max_health = 100;
         this.health = this.max_health;
+        this.killed_by = null;
 
         this.inventory = [ new game_weapon.knife( this ) ];
         this.equiped_weapon = this.inventory[0];
+
+        this.score = 0;
 
         // Input variables
         this.input_vector = null;
@@ -44,9 +47,12 @@
 
     }; //game_avatar.constructor
 
-    e.game_avatar.prototype.damage = function( amount ) {
+    e.game_avatar.prototype.damage = function( by, amount ) {
        
         this.health = Math.max( 0, this.health - amount );
+
+        if ( !this.is_alive() && by )
+            this.killed_by = by;
 
     };
 
@@ -85,6 +91,7 @@
     e.game_avatar.prototype.reset = function() {
         
         this.health = this.max_health;
+        this.killed_by = null;
 
     };
 

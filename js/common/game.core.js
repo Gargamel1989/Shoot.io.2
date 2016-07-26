@@ -262,6 +262,11 @@
 
             if ( !avatar.is_alive() ) {
 
+                if ( avatar.killed_by )
+                    avatar.killed_by.score += 100;
+
+                avatar.score -= 30;
+
                 avatar.reset();
                 this.move_to_random_position( avatar );
 
