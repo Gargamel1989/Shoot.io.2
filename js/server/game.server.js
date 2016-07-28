@@ -80,6 +80,16 @@ game_server.update = function( delta ) {
     // Update the world
     game_server.core.update( delta );
 
+    if ( game_server.core.deaths.length > 0 ) {
+
+        for ( player_id in game_server.players )
+            game_server.players[player_id].emit( 'serverevent', {
+                events: game_server.core.deaths.map( function( death ) {
+                    return death.victim.nickname + ' was killed by ' + death.killer.nickname + '\'s ' + death.killer.equiped_weapon.name;
+                } ) } );
+
+    }
+
     if ( debug )
         game_server.game_loop_dt_update = new Date().getTime() - start;
 
@@ -148,13 +158,19 @@ game_server.join = function( player, nickname, color ) {
     game_server.players[player.game_id] = player;
 
     game_server.core.add_avatar( player.game_id, player.nickname, player.color );
-
+        
     // Tell the player they connected, giving them their id
     player.emit( 'connected', { 
         id: player.game_id,
         nickname: player.nickname,
         color: player.color,
     } );
+
+    // Send a message to all players
+    for ( var player_id in game_server.players )
+        game_server.players[player_id].emit( 'serverevent', {
+            events: [player.nickname + ' has joined the game.'],
+        } );
 
 };
 
@@ -165,6 +181,12 @@ game_server.leave = function( player ) {
     delete game_server.players[player.game_id];
 
     game_server.core.remove_avatar( player.game_id );
+
+    // Send a message to all players
+    for ( var player_id in game_server.players )
+        game_server.players[player_id].emit( 'serverevent', {
+            events: [player.nickname + ' has left the game.'],
+        } );
 
 };
 

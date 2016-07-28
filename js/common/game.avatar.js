@@ -280,6 +280,7 @@
         
         this.nickname = snapshot.n;
         this.color = snapshot.c;
+        this.score = snapshot.s;
 
         this.position = snapshot.p;
         this.direction = snapshot.d;
@@ -297,6 +298,7 @@
         return {
             n: this.nickname,
             c: this.color,
+            s: this.score,
 
             p: this.position,
             d: this.direction,

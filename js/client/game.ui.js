@@ -8,6 +8,8 @@ var game_ui = function( game_core, stage, viewport, debug ) {
 
     this.player_avatar = null;
 
+    this.event_log = [];
+
     this.weapon_name_text = new createjs.Text( '', '20px Arial', '#FFF' );
 
     this.weapon_ammo_text = new createjs.Text( '', '20px Arial', '#FFF' );
@@ -19,6 +21,37 @@ var game_ui = function( game_core, stage, viewport, debug ) {
     this.stage.addChild( this.weapon_text_bg );
     this.stage.addChild( this.weapon_name_text );
     this.stage.addChild( this.weapon_ammo_text );
+
+
+    this.sb = {
+        w: 300,
+        h: 100
+    };
+    this.scoreboard_bg = new createjs.Shape();
+    this.scoreboard_bg.graphics.clear().f( '#000000' ).dr( 0, 0, this.sb.w, this.sb.h );
+    this.scoreboard_bg.alpha = 0.3;
+
+    this.scoreboard_text = new createjs.Text( '', '20px Arial', '#FFF' );
+    this.scoreboard_text.textAlign = 'end';
+
+    this.stage.addChild( this.scoreboard_bg );
+    this.stage.addChild( this.scoreboard_text );
+
+
+
+    this.el = {
+        w: 300,
+        h: 300,
+    };
+    this.eventlog_bg = new createjs.Shape();
+    this.eventlog_bg.graphics.clear().f( '#000000' ).dr( 0, 0, this.el.w, this.el.h );
+    this.eventlog_bg.alpha = 0.3;
+
+    this.eventlog_text = new createjs.Text( '', '20px Arial', '#FFF' );
+
+    this.stage.addChild( this.eventlog_bg );
+    this.stage.addChild( this.eventlog_text );
+
 
     this.game_loop_debug = null;
 
@@ -33,6 +66,7 @@ var game_ui = function( game_core, stage, viewport, debug ) {
         this.stage.addChild( this.debug_bar );
         this.stage.addChild( this.server_debug_text );
         this.stage.addChild( this.client_debug_text );
+
     }
 
 };
@@ -54,7 +88,24 @@ game_ui.prototype.set_viewport = function( x, y, w, h ) {
     this.weapon_ammo_text.x = this.weapon_text_bg.x + 10;
     this.weapon_ammo_text.y = this.weapon_text_bg.y + 40;
 
+
+    this.scoreboard_bg.x = x + w - this.ui_margin - this.sb.w;
+    this.scoreboard_bg.y = y + this.ui_margin;
+
+    this.scoreboard_text.x = x + w - this.ui_margin - 10;
+    this.scoreboard_text.y = this.scoreboard_bg.y + 10;
+
+
+    this.eventlog_bg.x = x + this.ui_margin;
+    this.eventlog_bg.y = y + h - this.ui_margin - this.el.h;
+
+    this.eventlog_text.x = this.eventlog_bg.x + 10;
+    this.eventlog_text.y = this.eventlog_bg.y + 10
+
     if ( this.debug ) {
+
+        this.scoreboard_bg.y += 40;
+        this.scoreboard_text.y += 40;
 
         this.debug_bar.graphics.clear().f( '#000' ).dr( x, y, w, 40 );
 
@@ -87,6 +138,16 @@ game_ui.prototype.update = function( dt ) {
         }
 
     }
+
+    var top_ten_scores = Object.keys( this.core.avatars ).map( function( avatar_id ) {
+        return this.core.avatars[avatar_id];
+    }.bind( this ) ).sort( function( avatar ) { 
+        return avatar.score; 
+    } ).slice( 0, 10 );
+
+    this.scoreboard_text.text = top_ten_scores.map( function( avatar, i ) { return '#' + ( i + 1 ) + ': ' + avatar.nickname + '\t\t' + avatar.score; } ).join( '\n' );
+
+    this.eventlog_text.text = this.event_log.slice( -10 ).join( '\n' );
 
     if ( this.debug ) {
 

@@ -108,6 +108,9 @@ game_client.prototype.connect = function( nickname, color ) {
     
 	// Sent each tick of the server simulation. This is our authorotive update
     this.socket.on( 'serverupdate', this.on_server_update.bind( this ) );
+
+    // Log server events
+    this.socket.on( 'serverevent', this.on_server_event.bind( this ) );
     
 };
 
@@ -170,6 +173,12 @@ game_client.prototype.on_disconnect = function() {
 game_client.prototype.on_message = function( data ) {
 
     console.log( 'Server Message:' + data );
+
+};
+
+game_client.prototype.on_server_event = function( data ) {
+
+    this.camera.ui.event_log.push.apply( this.camera.ui.event_log, data.events );
 
 };
 

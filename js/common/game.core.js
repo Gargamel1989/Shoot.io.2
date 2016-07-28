@@ -23,6 +23,8 @@
             { x: -1, y: this.world_size.height, w: this.world_size.width, h: 1 }
         );
 
+        this.deaths = [];
+
     };
 
     e.game_core.prototype.add_avatar = function( player_id, player_nickname, player_color ) {
@@ -254,6 +256,8 @@
 
         }
 
+        this.deaths = [];
+
         for ( var player_id in this.avatars ) {
 
             var avatar = this.avatars[player_id];
@@ -265,7 +269,12 @@
                 if ( avatar.killed_by )
                     avatar.killed_by.score += 100;
 
-                avatar.score -= 30;
+                avatar.score = Math.max( 0, avatar.score - 30 );
+
+                this.deaths.push( {
+                    victim: avatar,
+                    killer: avatar.killed_by,
+                } );
 
                 avatar.reset();
                 this.move_to_random_position( avatar );
