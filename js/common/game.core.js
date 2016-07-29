@@ -1,15 +1,14 @@
 ( function( e ) {
 
-    e.game_core = function() {
+    e.game_core = function( map_tmx_data ) {
 
         this.environment = game_avatar.environment;
         this.objects = game_avatar.objects;
         this.avatars = game_avatar.avatars;
 
-        this.world_size = {
-            width: 1292,
-            height: 770,
-        };
+        this.map = new game_map.game_map( map_tmx_data );
+        
+        this.world_size = this.map.size();
 
         // Base chance of a weapon spawn per second. This is modified by the
         // currrent amount of weapons on the map

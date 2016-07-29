@@ -1,0 +1,9 @@
+{
+    "images": ["assets/maps/tileset.png"],
+    "frames": {
+        width: 128,
+        height: 128,
+        spacing: 0,
+        margin: 0
+    },
+}

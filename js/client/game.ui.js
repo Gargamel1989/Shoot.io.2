@@ -1,8 +1,9 @@
-var game_ui = function( game_core, stage, viewport, debug ) {
+var game_ui = function( game_core, ui_layer, viewport, debug, debug_layer ) {
 
     this.core = game_core;
-    this.stage = stage;
+    this.ui_layer = ui_layer;
     this.debug = debug || true;
+    this.debug_layer = debug_layer;
 
     this.ui_margin = 20;
 
@@ -18,9 +19,9 @@ var game_ui = function( game_core, stage, viewport, debug ) {
     this.weapon_text_bg.graphics.clear().f( '#000000' ).dr( 0, 0, 300, 100 );
     this.weapon_text_bg.alpha = 0.3;
     
-    this.stage.addChild( this.weapon_text_bg );
-    this.stage.addChild( this.weapon_name_text );
-    this.stage.addChild( this.weapon_ammo_text );
+    this.ui_layer.addChild( this.weapon_text_bg );
+    this.ui_layer.addChild( this.weapon_name_text );
+    this.ui_layer.addChild( this.weapon_ammo_text );
 
 
     this.sb = {
@@ -34,8 +35,8 @@ var game_ui = function( game_core, stage, viewport, debug ) {
     this.scoreboard_text = new createjs.Text( '', '20px Arial', '#FFF' );
     this.scoreboard_text.textAlign = 'end';
 
-    this.stage.addChild( this.scoreboard_bg );
-    this.stage.addChild( this.scoreboard_text );
+    this.ui_layer.addChild( this.scoreboard_bg );
+    this.ui_layer.addChild( this.scoreboard_text );
 
 
 
@@ -49,8 +50,8 @@ var game_ui = function( game_core, stage, viewport, debug ) {
 
     this.eventlog_text = new createjs.Text( '', '20px Arial', '#FFF' );
 
-    this.stage.addChild( this.eventlog_bg );
-    this.stage.addChild( this.eventlog_text );
+    this.ui_layer.addChild( this.eventlog_bg );
+    this.ui_layer.addChild( this.eventlog_text );
 
 
     this.game_loop_debug = null;
@@ -63,9 +64,9 @@ var game_ui = function( game_core, stage, viewport, debug ) {
         this.server_debug_text = new createjs.Text( '', '16px Courier', '#FFF' );
         this.client_debug_text = new createjs.Text( '', '16px Courier', '#FFF' );
 
-        this.stage.addChild( this.debug_bar );
-        this.stage.addChild( this.server_debug_text );
-        this.stage.addChild( this.client_debug_text );
+        this.debug_layer.addChild( this.debug_bar );
+        this.debug_layer.addChild( this.server_debug_text );
+        this.debug_layer.addChild( this.client_debug_text );
 
     }
 

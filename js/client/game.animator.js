@@ -1,7 +1,9 @@
-var game_animator = function( camera, avatar, debug ) {
+var game_animator = function( camera, avatar_layer, hud_layer, avatar, debug, debug_layer ) {
 
 	this.camera = camera;
-	this.stage = this.camera.stage;
+	this.avatar_layer = avatar_layer;
+    this.hud_layer = hud_layer;
+    this.debug_layer = debug_layer;
 	
 	this.avatar = avatar;
     this.last_equiped_weapon_name = null;
@@ -41,34 +43,34 @@ var game_animator = function( camera, avatar, debug ) {
     this.nickname = new createjs.Text( this.avatar.nickname, 'bold 18px Arial', '#000' );
     this.nickname.textAlign = 'center';
 
+	this.visible = true;
+    this.avatar_layer.addChild( this.feet_sprite );
+    this.avatar_layer.addChild( this.body_sprite );
+    this.hud_layer.addChild( this.health_bar_wrapper );
+    this.hud_layer.addChild( this.health_bar );
+    this.hud_layer.addChild( this.nickname );
+
     if ( this.debug ) {
 
         this.debug_position = new createjs.Shape();
         this.debug_position.graphics.clear().f( 'red' ).dc( 0, 0, 20 );
         
-        this.stage.addChild( this.debug_position );
+        this.debug_layer.addChild( this.debug_position );
+    
     }
-
-	this.visible = true;
-    this.stage.addChild( this.feet_sprite );
-    this.stage.addChild( this.body_sprite );
-    this.stage.addChild( this.health_bar_wrapper );
-    this.stage.addChild( this.health_bar );
-    this.stage.addChild( this.nickname );
-
 };
 
 game_animator.prototype.destroy = function() {
 
-    this.stage.removeChild( this.feet_sprite );
-    this.stage.removeChild( this.body_sprite );
-    this.stage.removeChild( this.health_bar_wrapper );
-    this.stage.removeChild( this.health_bar );
-    this.stage.removeChild( this.nickname );
+    this.avatar_layer.removeChild( this.feet_sprite );
+    this.avatar_layer.removeChild( this.body_sprite );
+    this.hud_layer.removeChild( this.health_bar_wrapper );
+    this.hud_layer.removeChild( this.health_bar );
+    this.hud_layer.removeChild( this.nickname );
 
     if ( this.debug ) {
 
-        this.stage.removeChild( this.debug_position );
+        this.debug_layer.removeChild( this.debug_position );
 
     }
 
@@ -81,7 +83,7 @@ game_animator.prototype.update = function( dt ) {
 
     if ( this.last_equiped_weapon_name != this.avatar.equiped_weapon.name ) {
 
-        this.stage.removeChild( this.body_sprite );
+        this.avatar_layer.removeChild( this.body_sprite );
 
         switch ( this.avatar.equiped_weapon.name ) {
 
@@ -106,7 +108,7 @@ game_animator.prototype.update = function( dt ) {
         this.body_sprite.scaleX = this.sprite_scale;
         this.body_sprite.scaleY = this.sprite_scale;
 
-        this.stage.addChild( this.body_sprite );
+        this.avatar_layer.addChild( this.body_sprite );
 
     }
 

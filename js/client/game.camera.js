@@ -24,10 +24,31 @@ var game_camera = function( game_core, debug ) {
     
     this.stage = new createjs.Stage( this.canvas );
 
+    // Layer containers for sprite ordering
+    this.l_map_low = new createjs.Container();
+        this.stage.addChild( this.l_map_low );
+    this.l_objects = new createjs.Container();
+        this.stage.addChild( this.l_objects );
+    this.l_avatars = new createjs.Container();
+        this.stage.addChild( this.l_avatars );
+    this.l_particles = new createjs.Container();
+        this.stage.addChild( this.l_particles );
+    this.l_hud = new createjs.Container();
+        this.stage.addChild( this.l_hud );
+    this.l_map_high = new createjs.Container();
+    this.l_map_high.alpha = 0.6;
+        this.stage.addChild( this.l_map_high );
+    this.l_ui = new createjs.Container();
+        this.stage.addChild( this.l_ui );
+
     this.map = new createjs.Bitmap( assets.getResult( 'map_debug' ) );
-    this.stage.addChild( this.map );
+    this.l_map_low.addChild( this.map );
 
     if ( this.debug ) {
+
+        this.l_debug = new createjs.Container();
+        this.l_debug.alpha = 0.3;
+            this.stage.addChild( this.l_debug );
 
         this.debug_env_sprites = [];
 
@@ -37,13 +58,13 @@ var game_camera = function( game_core, debug ) {
             var env_sprite = new createjs.Shape();
             env_sprite.graphics.clear().f( 'purple' ).dr( 0, 0, env_obj.w, env_obj.h );
             this.debug_env_sprites.push( env_sprite );
-            this.stage.addChild( env_sprite );
+            this.l_debug.addChild( env_sprite );
 
         }
 
     } 
 
-    this.ui = new game_ui( this.core, this.stage, this.viewport, this.debug );
+    this.ui = new game_ui( this.core, this.l_ui, this.viewport, this.debug, this.l_debug );
 
     this.viewport = new createjs.Shape();
     this.stage.mask = this.viewport;
@@ -144,7 +165,7 @@ game_camera.prototype.update = function( dt ) {
             this.objects[object_id].scaleX = 0.4;
             this.objects[object_id].scaleY = 0.4;
 
-            this.stage.addChild( this.objects[object_id] );
+            this.l_objects.addChild( this.objects[object_id] );
 
         }
         
@@ -170,7 +191,7 @@ game_camera.prototype.update = function( dt ) {
     for ( var player_id in this.core.avatars ) {
         
         if ( !this.animators[player_id] )
-            this.animators[player_id] = new game_animator( this, this.core.avatars[player_id], this.debug );
+            this.animators[player_id] = new game_animator( this, this.l_avatars, this.l_hud, this.core.avatars[player_id], this.debug, this.l_debug );
 
     }
 
@@ -204,7 +225,7 @@ game_camera.prototype.update = function( dt ) {
                         this.particle_sprites[particle_id] = new createjs.Shape();
                         this.particle_sprites[particle_id].graphics.clear().f( 'white' ).dc( 0, 0, particle.hitbox_radius );
 
-                        this.stage.addChild( this.particle_sprites[particle_id] );
+                        this.l_particles.addChild( this.particle_sprites[particle_id] );
 
                     }
                     break;
@@ -215,7 +236,7 @@ game_camera.prototype.update = function( dt ) {
                     this.particle_sprites[particle_id] = new createjs.Shape();
                     this.particle_sprites[particle_id].graphics.clear().f( 'black' ).dc( 0, 0, particle.hitbox_radius );
 
-                    this.stage.addChild( this.particle_sprites[particle_id] );
+                    this.l_particles.addChild( this.particle_sprites[particle_id] );
                     break;
 
             }

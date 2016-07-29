@@ -1,12 +1,18 @@
 g               = require( __base + 'js/common/game.globals.js' ),
 f               = require( __base + 'js/common/game.functions.js' ),
 game_core       = require( __base + 'js/common/game.core.js' ),
-game_avatar     = require( __base + 'js/common/game.avatar.js' );
-game_weapon     = require( __base + 'js/common/game.weapon.js' );
-game_particle   = require( __base + 'js/common/game.particle.js' );
+game_map        = require( __base + 'js/common/game.map.js' ),
+game_avatar     = require( __base + 'js/common/game.avatar.js' ),
+game_weapon     = require( __base + 'js/common/game.weapon.js' ),
+game_particle   = require( __base + 'js/common/game.particle.js' ),
 game_object     = require( __base + 'js/common/game.object.js' );
 
-UUID            = require( 'node-uuid' );
+var fs          = require( 'fs' ),
+    path        = require( 'path' );
+map_file        = path.join( __base + 'assets/maps/test/example.tmx' );
+
+UUID            = require( 'node-uuid' ),
+DOMParser       = require( 'xmldom' ).DOMParser;
 
 var MainLoop    = require( 'mainloop.js' ),
 
@@ -15,7 +21,8 @@ var MainLoop    = require( 'mainloop.js' ),
 
 var game_server = module.exports = {
 
-    core: new game_core.game_core(),
+    core: new game_core.game_core( fs.readFileSync( map_file, 'utf-8' ) ),
+
     players: {},
 
     inputs: {},
@@ -75,7 +82,7 @@ game_server.update = function( delta ) {
     if ( debug )
         var start = new Date().getTime();
 
-    game_server.spawn_random_shit( delta );
+//    game_server.spawn_random_shit( delta );
 
     // Update the world
     game_server.core.update( delta );

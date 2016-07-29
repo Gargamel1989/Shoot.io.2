@@ -1,15 +1,17 @@
 var assets,
 	assets_manifest = [
-        { id: 'feet', src: 'img/sprites/feet.json', type: 'spritesheet' },
-        { id: 'body_knife', src: 'img/sprites/body_knife.json', type: 'spritesheet' },
-        { id: 'body_handgun', src: 'img/sprites/body_handgun.json', type: 'spritesheet' },
-        { id: 'body_shotgun', src: 'img/sprites/body_shotgun.json', type: 'spritesheet' },
-        { id: 'body_rifle', src: 'img/sprites/body_rifle.json', type: 'spritesheet' },
+        { id: 'feet', src: 'assets/sprites/feet.json', type: 'spritesheet' },
+        { id: 'body_knife', src: 'assets/sprites/body_knife.json', type: 'spritesheet' },
+        { id: 'body_handgun', src: 'assets/sprites/body_handgun.json', type: 'spritesheet' },
+        { id: 'body_shotgun', src: 'assets/sprites/body_shotgun.json', type: 'spritesheet' },
+        { id: 'body_rifle', src: 'assets/sprites/body_rifle.json', type: 'spritesheet' },
 
-        { id: 'weapons', src: 'img/sprites/weapons.json', type: 'spritesheet' },
-        { id: 'ammo', src: 'img/sprites/ammo.json', type: 'spritesheet' },
-        
-        { id: 'map_debug', src: 'img/maps/debug.png', type: 'image' },
+        { id: 'weapons', src: 'assets/sprites/weapons.json', type: 'spritesheet' },
+        { id: 'ammo', src: 'assets/sprites/ammo.json', type: 'spritesheet' },
+
+        { id: 'map_tileset', src: 'assets/maps/tileset.json', type: 'spritesheet' },
+        { id: 'map_tmx', src: 'assets/maps/test/example.tmx', type: 'text' },
+        { id: 'map_debug', src: 'assets/maps/debug.png', type: 'image' },
     ];
 
 window.onload = function() {
@@ -120,7 +122,7 @@ game_client.prototype.on_connected = function( player ) {
 
 	this.player_id = player.id;
 
-    this.core = new game_core.game_core();
+    this.core = new game_core.game_core( assets.getResult( 'map_tmx' ) );
     var player_avatar = this.core.add_avatar( this.player_id, player.nickname, player.color );
 
     this.camera = new game_camera( this.core );
